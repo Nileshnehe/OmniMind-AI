@@ -1,0 +1,81 @@
+@import "tailwindcss";
+
+@theme {
+  /* Fonts Stack */
+  --font-primary: 'Inter', 'SF Pro Display', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+  --font-sans: var(--font-primary);
+
+  /* Typography Scale according to image */
+  --text-display: 36px; --text-display--font-weight: 700; --text-display--line-height: 1.1;
+  --text-h1: 28px;      --text-h1--font-weight: 700;      --text-h1--line-height: 1.2;
+  --text-h2: 22px;      --text-h2--font-weight: 600;      --text-h2--line-height: 1.3;
+  --text-h3: 18px;      --text-h3--font-weight: 600;      --text-h3--line-height: 1.35;
+  --text-h4: 15px;      --text-h4--font-weight: 600;      --text-h4--line-height: 1.4;
+  --text-body-lg: 17px; --text-body-lg--font-weight: 400; --text-body-lg--line-height: 1.7;
+  --text-body: 15px;    --text-body--font-weight: 400;    --text-body--line-height: 1.65;
+  --text-body-sm: 13px; --text-body-sm--font-weight: 400; --text-body-sm--line-height: 1.6;
+  --text-ui: 14px;      --text-ui--font-weight: 500;      --text-ui--line-height: 1.4;
+  --text-ui-sm: 12px;   --text-ui-sm--font-weight: 500;   --text-ui-sm--line-height: 1.4;
+  --text-overline: 11px;--text-overline--font-weight: 500;--text-overline--letter-spacing: 0.08em;
+  --text-code: 13px;    --text-code--font-weight: 400;    --text-code--font-family: var(--font-mono);
+
+  /* Light Mode Base Design Tokens */
+  --color-brand: #5B4AE8;         
+  --color-accent: #1AC994;        
+  --color-bg-page: #F7F6F2;       
+  --color-bg-card: #FFFFFF;       
+  --color-text-primary: #0D0B14;  
+  --color-text-muted: #5A566B;    
+  --color-border: #E0DDD5;        
+  --color-surface-hover: #F0EDE6;
+}
+
+@variant dark (&:where(.dark, .dark *));
+
+.dark {
+  /* Dark Mode Overrides (Aegis AI Exact Look) */
+  --color-brand: #7B6AFF;         
+  --color-accent: #00C48C;        
+  --color-bg-page: #0D0E15;       
+  --color-bg-card: #161722;       
+  --color-text-primary: #F1F1F6;  
+  --color-text-muted: #9499b3;    
+  --color-border: #2D3042;        
+  --color-surface-hover: #222436;
+}
+
+/* --- Premium Custom Scrollbar System --- */
+.omnimind-scroller {
+  overflow-y: auto;
+  /* Firefox Config */
+  scrollbar-width: none; /* Default me hidden */
+  transition: scrollbar-color 0.3s ease;
+}
+
+.omnimind-scroller:hover {
+  scrollbar-width: thin; /* Hover pe patla dikhega */
+}
+
+/* Chrome, Safari, Edge Controls */
+.omnimind-scroller::-webkit-scrollbar {
+  width: 5px !important; /* Ekdum slim patli line */
+}
+
+.omnimind-scroller::-webkit-scrollbar-track {
+  background: transparent !important; /* Ganda white/grey background lock khatam */
+}
+
+.omnimind-scroller::-webkit-scrollbar-thumb {
+  background: transparent !important; /* Default me hidden */
+  border-radius: 9999px !important;
+}
+
+/* Hover active state logic */
+.omnimind-scroller:hover::-webkit-scrollbar-thumb {
+  background: rgba(148, 153, 179, 0.25) !important; /* Soft translucent indicator */
+}
+
+.omnimind-scroller::-webkit-scrollbar-thumb:hover {
+  background: rgba(148, 153, 179, 0.45) !important; /* Scroll pakadne pe thoda bright */
+}
