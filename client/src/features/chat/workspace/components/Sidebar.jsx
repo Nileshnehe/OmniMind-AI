@@ -77,7 +77,7 @@ const Sidebar = ({ isOpen, onToggle }) => {
 
       {/* Sidebar Bottom */}
       <div className='mt-auto pt-2 border-t border-border/40 flex-shrink-0 pr-2'>
-        <UserProfileBlock />
+        <UserProfileBlock  isOpen={isOpen} />
       </div>
 
     </div>
