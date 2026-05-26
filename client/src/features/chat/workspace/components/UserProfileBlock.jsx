@@ -16,7 +16,7 @@ const UserProfileBlock = ({ isOpen }) => {
           className='w-9 h-9 rounded-full object-contain dark:invert flex-shrink-0' 
         />
 
-        {/* ⚡ TEXT BLOCK: Only renders when sidebar is fully open */}
+        {/*   TEXT BLOCK: Only renders when sidebar is fully open */}
         {isOpen && (
           <div className='flex flex-col min-w-0 leading-tight text-left pr-1'>
             <p className='font-semibold text-[14px] tracking-wide truncate w-full'>
