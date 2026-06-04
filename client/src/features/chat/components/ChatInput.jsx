@@ -3,7 +3,7 @@ import { useState } from 'react'
 
 import sendIcon from '../../../assets/send.svg'
 
-const ChatInput = () => {
+const ChatInput = ({onSendMessage}) => {
 
   const [text, setText] = useState('')
 
