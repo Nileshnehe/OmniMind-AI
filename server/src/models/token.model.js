@@ -1,31 +1,28 @@
-import mongoose from 'mongoose';
+import mongoose from "mongoose";
 
-const tokenSchema = new mongoose.Schema({
+const tokenSchema = new mongoose.Schema(
+  {
     userId: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'User',
-        required: true,
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
     },
     token: {
-        type: String,
-        required: true,
+      type: String,
+      required: true, // SHA-256 Hashed string store hogi
     },
     expiresAt: {
-        type: Date,
-        required: true,
+      type: Date,
+      required: true,
     },
-    createdAt: {
-        type: Date,
-        default: Date.now,
-        expires: 0,
-    }
-}, {
-    timestamps: true
-});
+  },
+  {
+    timestamps: true,
+  }
+);
 
-
+// MongoDB TTL Index: Jo document expiresAt time par automatically delete kar dega
 tokenSchema.index({ expiresAt: 1 }, { expireAfterSeconds: 0 });
 
-const Token = mongoose.model('Token', tokenSchema);
-
+const Token = mongoose.model("Token", tokenSchema);
 export default Token;
