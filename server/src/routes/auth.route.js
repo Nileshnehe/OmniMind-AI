@@ -1,18 +1,12 @@
-import express from "express";
-import { registerController } from "../controller/auth.controller.js";
-import { loginController } from "../controller/auth.controller.js";
+import express, { Router } from "express";
+import { loginController, registerController } from "../controller/auth.controller.js";
+import { loginSchema, registerSchema } from "../validators/auth.validator.js";
+import validate from "../middlewares/validate.js";
 
-const authRouter = express.Router();
 
-authRouter.get("/healthz", (req, res) => {
-    try {
-        res.status(200).json({ message: "ok" })
-    } catch (error) {
-        res.status(500).json({ error: error.message })
-    }
-})
+const router = Router()
 
-authRouter.post("/register", registerController)
-authRouter.post("/login", loginController)
 
-export default authRouter;
+router.post("/register", validate(registerSchema), registerController);
+router.post("/login", validate(loginSchema), loginController)
+export default router;

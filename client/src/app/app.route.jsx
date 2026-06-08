@@ -4,6 +4,7 @@ import Sidebar from '../features/chat/workspace/components/Sidebar'
 import Dashboard from '../features/chat/layout/Dashboard'
 import { Children } from 'react'
 import Login from '../features/auth/pages/Login'
+import PricingPlans from '../../../../Users/nilesh/Downloads/PricingPlans'
 
 export const routes = createBrowserRouter([
 
@@ -15,6 +16,10 @@ export const routes = createBrowserRouter([
         path: '/register',
         element: <Register />
 
+    },
+    {
+        path: '/price',
+        element: <PricingPlans />
     },
     {
         path: '/',

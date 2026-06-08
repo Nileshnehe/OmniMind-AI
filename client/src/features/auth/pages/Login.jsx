@@ -15,7 +15,7 @@ const Login = () => {
       return
     }
 
-    console.log('Login Form Validated:', { email, password })
+    // console.log('Login Form Validated:', { email, password })
   }
 
   return (

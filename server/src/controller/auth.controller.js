@@ -1,33 +1,43 @@
-import { registerUser } from "../services/auth.service.js";
+import { loginUser, registerUser } from "../services/auth.service.js";
 
-const COOKIES_OPTIONS = {
+
+const COOKIES_OPTION = {
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production", // Auto handle for production
+    secure: process.env.NODE_ENV === "production",
     sameSite: "lax",
-    maxAge: 7 * 24 * 60 * 60 * 1000,
-};
+    maxAge: 7 * 24 * 60 * 60 * 100
+}
 
-export const registerController = async (req, res) => {
-    
+export const registerController = async (req, res, next) => {
     try {
-        const { user, accessToken, refreshToken } = await registerUser(req.body);
-        
-        res.cookie("refreshToken", refreshToken, COOKIES_OPTIONS);
+        const {user, accessToken, refreshToken} = await registerUser(req.body);
+
+        res.cookie("refreshToken", refreshToken, COOKIES_OPTION);
 
         return res.status(201).json({
             success: true,
-            message: "Registration Successfully",
-            data: { user, accessToken }
-        });
+            message: "User register successfully",
+            data: {userId: user._id, accessToken}
+        })
+
     } catch (error) {
-        return res.status(error.statusCode || 500).json({
-            success: false,
-            message: error.message || "Internal Server Error"
-        });
+        next(error)
     }
-};
-
-export const loginController = async (req, res) => {
-
 }
 
+export const loginController = async (req, res, next) => {
+    try {
+
+        const {user, accessToken, refreshToken} = await loginUser(req.body);
+        res.cookie("refreshToken", refreshToken, COOKIES_OPTION);
+
+        return res.status(200).json({
+            success: true,
+            message: "Login successfully",
+            data: {userId: user._id, accessToken}
+        })
+
+    } catch (error) {
+        next(error)
+    }
+}
