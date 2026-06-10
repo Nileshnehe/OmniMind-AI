@@ -9,47 +9,41 @@ const Login = () => {
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
   const [error, setError] = useState('')
+  const [loading, setLoading] = useState(false)
 
-  const navigate = useNavigate
-  // const handleLogin = (e) => {
-  //   e.preventDefault()
-  //   setError('')
+  const navigate = useNavigate()
 
-  //   if (!email.trim() || !password.trim()) {
-  //     setError('Please fill in all fields.')
-  //     return
-  //   }
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    setError('');
 
-  //   // console.log('Login Form Validated:', { email, password })
-  // }
-
-const handleLogin = async (e) => {
-  e.preventDefault();
-  setError(''); // clear parameters state variables
-
-  if (!email.trim() || !password.trim()) {
-    setError('Please fill in all fields.');
-    return;
-  }
-
-  try {
-    const backendResponse = await authServices.loginUser(email, password);
-    
-    // 🟢 True Success Authentication Path Matrix
-    if (backendResponse && backendResponse.success) {
-      localStorage.setItem('omnimind_token', backendResponse.data?.accessToken);
-      alert('Access Granted! Synchronizing Core Dashboard Workspace Nodes.');
-      navigate('/'); // Dashboard main layout screen redirect trigger
+    if (!email.trim() || !password.trim()) {
+      setError('Please fill in all fields.');
+      return;
     }
-  } catch (err) {
-    // 🔴 Catch block triggered directly on 400 or 401!
-    console.log("Axios Caught Error Array Object:", err.response?.data);
-    
-    // Matrix reads string dynamic values flawlessly now
-    const rawErrorMessageText = err.response?.data?.message || 'Invalid credentials provided.';
-    setError(rawErrorMessageText);
-  }
-};
+
+    setLoading(true);
+    try {
+      const backendResponse = await authServices.loginUser(email, password);
+
+      if (backendResponse && backendResponse.success) {
+        localStorage.setItem('omnimind_token', backendResponse.data?.accessToken);
+        navigate('/');
+      } else {
+        // Handle success:false without an HTTP error (e.g. unverified email)
+        setError(backendResponse?.message || 'Login failed. Please try again.');
+      }
+    } catch (err) {
+      // HTTP 4xx / 5xx errors land here
+      const rawErrorMessageText =
+        err.response?.data?.message ||
+        err.response?.data?.error ||
+        'Invalid credentials. Please try again.';
+      setError(rawErrorMessageText);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
 
@@ -132,9 +126,10 @@ const handleLogin = async (e) => {
 
             <button
               type="submit"
-              className='w-full mt-2 bg-brand dark:bg-[#7B6AFF] hover:opacity-95 text-white font-semibold text-[15px] h-12 rounded-xl cursor-pointer transition-all active:scale-[0.99] shadow-md flex items-center justify-center'
+              disabled={loading}
+              className='w-full mt-2 bg-brand dark:bg-[#7B6AFF] hover:opacity-95 text-white font-semibold text-[15px] h-12 rounded-xl cursor-pointer transition-all active:scale-[0.99] shadow-md flex items-center justify-center disabled:opacity-60 disabled:cursor-not-allowed'
             >
-              Sign In
+              {loading ? 'Signing in...' : 'Sign In'}
             </button>
             <p className='text-ui-sm text-text-muted text-left mt-2 select-none font-medium'>
               Don't have an account?{' '}

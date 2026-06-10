@@ -11,7 +11,7 @@ const Register = () => {
     const [showPassword, setShowPassword] = useState(false)
     const [error, setError] = useState('')
 
-    const navigate = useNavigate
+    const navigate = useNavigate()
 
     const handleRegister = async (e) => {
   e.preventDefault();

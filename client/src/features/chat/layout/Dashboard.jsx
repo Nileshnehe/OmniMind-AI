@@ -13,7 +13,7 @@ const Dashboard = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true)
   const [messages, setMessages] = useState([])
   const [userProfile, setUserProfile] = useState(null)
-  const navigate = useNavigate
+  const navigate = useNavigate()
 
   const [input, setInput] = useState('')
 
@@ -31,7 +31,7 @@ const Dashboard = () => {
     const fetchSessionData = async () => {
       try {
         const data = await authServices.getMeProfile();
-        setUserProfile(data.user); // Maan lete hain backend schema me { user: { name, email, role } } aa rha hai
+        setUserProfile(data?.data ?? null);
       } catch (err) {
         console.error('Session expired or invalid authorization trace:', err);
         localStorage.removeItem('omnimind_token'); // Clear corrupted storage credentials cache
