@@ -1,22 +1,55 @@
 import React, { useState } from 'react'
-import { Link } from "react-router"
+import { Link, useNavigate } from "react-router"
+import { authServices } from '../services/auth.service'
+
+
+
 const Login = () => {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
   const [error, setError] = useState('')
 
-  const handleLogin = (e) => {
-    e.preventDefault()
-    setError('')
+  const navigate = useNavigate
+  // const handleLogin = (e) => {
+  //   e.preventDefault()
+  //   setError('')
 
-    if (!email.trim() || !password.trim()) {
-      setError('Please fill in all fields.')
-      return
-    }
+  //   if (!email.trim() || !password.trim()) {
+  //     setError('Please fill in all fields.')
+  //     return
+  //   }
 
-    // console.log('Login Form Validated:', { email, password })
+  //   // console.log('Login Form Validated:', { email, password })
+  // }
+
+const handleLogin = async (e) => {
+  e.preventDefault();
+  setError(''); // clear parameters state variables
+
+  if (!email.trim() || !password.trim()) {
+    setError('Please fill in all fields.');
+    return;
   }
+
+  try {
+    const backendResponse = await authServices.loginUser(email, password);
+    
+    // 🟢 True Success Authentication Path Matrix
+    if (backendResponse && backendResponse.success) {
+      localStorage.setItem('omnimind_token', backendResponse.data?.accessToken);
+      alert('Access Granted! Synchronizing Core Dashboard Workspace Nodes.');
+      navigate('/'); // Dashboard main layout screen redirect trigger
+    }
+  } catch (err) {
+    // 🔴 Catch block triggered directly on 400 or 401!
+    console.log("Axios Caught Error Array Object:", err.response?.data);
+    
+    // Matrix reads string dynamic values flawlessly now
+    const rawErrorMessageText = err.response?.data?.message || 'Invalid credentials provided.';
+    setError(rawErrorMessageText);
+  }
+};
 
   return (
 

@@ -2,14 +2,18 @@ import React, { useState } from 'react'
 import Sidebar from '../workspace/components/Sidebar'
 import toggleIcon from '../../../assets/sideNavigation.svg'
 import ChatInput from '../components/ChatInput'
+import { authServices } from '../../auth/services/auth.service'
+import { useNavigate } from 'react-router'
+import { useEffect } from 'react'
+
+
+
 const Dashboard = () => {
 
   const [isSidebarOpen, setIsSidebarOpen] = useState(true)
-
-
-  const [messages, setMessages] = useState([
-
-  ])
+  const [messages, setMessages] = useState([])
+  const [userProfile, setUserProfile] = useState(null)
+  const navigate = useNavigate
 
   const [input, setInput] = useState('')
 
@@ -19,9 +23,24 @@ const Dashboard = () => {
     setMessages(updateMessage);
 
     setTimeout(() => {
-      setMessages([...updateMessage, {sender: 'ai', text: `This is a smart response from OmniMind AI for: "${userMessage}"`}])
+      setMessages([...updateMessage, { sender: 'ai', text: `This is a smart response from OmniMind AI for: "${userMessage}"` }])
     }, 1000)
   }
+
+  useEffect(() => {
+    const fetchSessionData = async () => {
+      try {
+        const data = await authServices.getMeProfile();
+        setUserProfile(data.user); // Maan lete hain backend schema me { user: { name, email, role } } aa rha hai
+      } catch (err) {
+        console.error('Session expired or invalid authorization trace:', err);
+        localStorage.removeItem('omnimind_token'); // Clear corrupted storage credentials cache
+        navigate('/login'); // Session failure kickback to access matrix route login panel
+      }
+    };
+
+    fetchSessionData();
+  }, [navigate]);
 
   return (
     <div className='h-screen w-full flex bg-bg-page dark:bg-[#0D0E15] overflow-hidden relative transition-colors duration-200'

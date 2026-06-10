@@ -1,16 +1,16 @@
 import { Router } from "express";
-import { 
-  registerController, 
-  loginController, 
-  verifyEmailController, 
-  getMeController, 
-  refreshTokenController, 
-  logoutController 
+import {
+  registerController,
+  loginController,
+  verifyEmailController,
+  getMeController,
+  refreshTokenController,
+  logoutController
 } from "../controller/auth.controller.js";
 
 // Middlewares imports
-import validate from "../middlewares/validate.js";
-import isAuthenticated from "../middlewares/isAuthenticated.js";
+import validate from "../middlewares/validate.js"
+import  isAuthenticated  from "../middlewares/isAuthenticated.js";
 import { authRateLimiter } from "../middlewares/rateLimiter.js";
 
 // Validation rules inputs mapping

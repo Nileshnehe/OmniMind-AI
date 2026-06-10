@@ -1,5 +1,8 @@
 import React, { useState } from 'react'
-import { Link } from 'react-router'
+import { Link, useNavigate } from 'react-router'
+import { authServices } from '../services/auth.service'
+
+
 
 const Register = () => {
     const [name, setName] = useState('')
@@ -8,25 +11,24 @@ const Register = () => {
     const [showPassword, setShowPassword] = useState(false)
     const [error, setError] = useState('')
 
-    // const avatarLetter = name.trim() ? name.trim().charAt(0).toUpperCase() : '?'
+    const navigate = useNavigate
 
-    const handleRegister = (e) => {
-        e.preventDefault()
-        setError('')
+    const handleRegister = async (e) => {
+  e.preventDefault();
+  setError('');
 
-        if (!name.trim() || !email.trim() || !password.trim()) {
-            setError('All fields are required.')
-            return
-        }
+  // ... (purane components basic string metrics parameters checks)
 
-        const strongPasswordRegex = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,}$/
-        if (!strongPasswordRegex.test(password)) {
-            setError('Password requires min 6 chars, with letters, numbers & special keys (@*!).')
-            return
-        }
-
-        // console.log('Form Authenticated:', { name, email, password, avatarLetter })
-    }
+  try {
+    // ⚡ Network API dispatch
+    const data = await authServices.registerUser(name, email, password);
+    alert('Registration Complete! Welcome to OmniMind AI.');
+    navigate('/login'); 
+  } catch (err) {
+    
+    setError(err.response?.data?.message || 'Something went wrong during signup.');
+  }
+};
 
     return (
 
