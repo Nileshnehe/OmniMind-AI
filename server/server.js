@@ -1,26 +1,21 @@
-import { config } from "dotenv";
-config();
-
 import app from "./src/app.js";
-import connectDB from "./src/config/db.js"
+import connectDB from "./src/config/db.js";
 
 
-const PORT = process.env.PORT || 4000
+const PORT = process.env.PORT
+
 
 const startServer = async () => {
     try {
+        
         await connectDB()
 
-        app.listen(PORT, () => {
-            console.log(`Server is running on port ${PORT}`);
-        })
-
+        app.listen(3000, () => {
+    console.log(`server is running on port 3000`)
+});
     } catch (error) {
         console.log("Critical Startup Error:", error.message);
         process.exit(1);
     }
 }
-
-
-
 startServer();

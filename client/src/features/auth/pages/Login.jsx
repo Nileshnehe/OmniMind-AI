@@ -39,7 +39,6 @@ const Login = () => {
         err.response?.data?.message ||
         err.response?.data?.error ||
         'Invalid credentials. Please try again.';
-      setError(rawErrorMessageText);
     } finally {
       setLoading(false);
     }
