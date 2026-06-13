@@ -6,7 +6,7 @@ import { testAi } from "./src/services/ai.service.js";
 
 const PORT = configData.PORT
 
-testAi()
+// testAi()
 const startServer = async () => {
     try {
         
