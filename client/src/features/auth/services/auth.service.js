@@ -16,5 +16,10 @@ export const authServices = {
     getMeProfile: async () => {
         const response = await API.get('/auth/me');
         return response.data;
+    },
+
+    logoutUser: async () => {
+        const response = await API.post('/auth/logout');
+        return response.data;
     }
 }
