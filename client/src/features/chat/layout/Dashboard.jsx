@@ -5,14 +5,14 @@ import ChatInput from '../components/ChatInput'
 import { authServices } from '../../auth/services/auth.service'
 import { useNavigate } from 'react-router'
 import { useEffect } from 'react'
-
+import API from '../../../services/api'
 
 
 const Dashboard = () => {
 
   const [isSidebarOpen, setIsSidebarOpen] = useState(true)
   const [messages, setMessages] = useState([])
-  const [userProfile, setUserProfile] = useState(null)
+  const [userProfile, setUserProfile] = useState({ username: "Loading..." })
   const navigate = useNavigate()
 
   const [input, setInput] = useState('')
@@ -28,18 +28,26 @@ const Dashboard = () => {
   }
 
   useEffect(() => {
-    const fetchSessionData = async () => {
+    const fetchUserData = async () => {
       try {
-        const data = await authServices.getMeProfile();
-        setUserProfile(data?.data ?? null);
+        
+        const response = await API.get('/auth/me');
+
+        console.log("=== DASHBOARD API RESPONSE RAW ===", response.data);
+
+        
+        if (response.data && response.data.success) {
+          
+          setUserProfile(response.data.data || response.data.user);
+        }
       } catch (err) {
-        console.error('Session expired or invalid authorization trace:', err);
-        localStorage.removeItem('omnimind_token'); // Clear corrupted storage credentials cache
-        navigate('/login'); // Session failure kickback to access matrix route login panel
+        console.error("Profile payload session failure:", err);
+        
+        navigate('/login');
       }
     };
 
-    fetchSessionData();
+    fetchUserData();
   }, [navigate]);
 
   return (
@@ -47,7 +55,7 @@ const Dashboard = () => {
 
     >
 
-      <Sidebar isOpen={isSidebarOpen} onToggle={() => setIsSidebarOpen(!isSidebarOpen)} />
+      <Sidebar isOpen={isSidebarOpen} onToggle={() => setIsSidebarOpen(!isSidebarOpen)} user={userProfile} />
 
       <div className='flex-1 h-full w-full flex flex-col relative bg-bg-page dark:bg-[#0D0E15] transition-all duration-300 '>
         <div className=' flex-1 w-full p-6  mx-auto flex flex-col gap-4 overflow-y-auto omnimind-scrollbar'>
