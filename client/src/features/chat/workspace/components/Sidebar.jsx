@@ -11,7 +11,8 @@ import searchIcon from '../../../../assets/search.svg'
 import moreVertIcon from '../../../../assets/morevert.svg'
 
 
-const Sidebar = ({ isOpen, onToggle }) => {
+const Sidebar = ({ isOpen, onToggle, user }) => {
+  console.log("Sidebar props user:", user);
   return (
     <div className={`h-screen bg-bg-card dark:bg-[#161722] flex flex-col py-4 px-2 border-r border-border dark:border-[#2D3042] select-none transition-all duration-300 ease-in-out items-center
       ${isOpen ? 'w-80' : 'w-16'}
@@ -124,7 +125,7 @@ const Sidebar = ({ isOpen, onToggle }) => {
 
       {/* Sidebar Bottom */}
       <div className='mt-auto pt-2 border-t border-border/40 flex-shrink-0 w-full px-1'>
-        <UserProfileBlock isOpen={isOpen} />
+        <UserProfileBlock isOpen={isOpen} user={user} />
       </div>
 
     </div>
