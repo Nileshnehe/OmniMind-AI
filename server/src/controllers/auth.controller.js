@@ -30,7 +30,7 @@ export async function register(req, res) {
 
         // 3. Sign Token
         const emailVerificationToken = jwt.sign(
-            { email: user.email }, 
+            { email: user.email },
             configData.JWT_SECRET,
             { expiresIn: '1d' } // Good practice: add an expiration!
         );
@@ -39,7 +39,7 @@ export async function register(req, res) {
         await sendEmail({
             to: email,
             subject: "Welcome to Omnimind AI",
-           html: `
+            html: `
 <!DOCTYPE html>
 <html>
 <head>
@@ -129,7 +129,7 @@ export async function login(req, res) {
     try {
         const { email, password } = req.body;
 
-        
+
         const user = await userModel.findOne({ email });
 
         if (!user) {
@@ -140,7 +140,7 @@ export async function login(req, res) {
             });
         }
 
-        
+
         const isPasswordMatch = await user.comparePassword(password);
 
         if (!isPasswordMatch) {
@@ -151,7 +151,7 @@ export async function login(req, res) {
             });
         }
 
-        
+
         if (!user.verified) {
             return res.status(400).json({
                 message: "Please verify your email before logging in",
@@ -160,7 +160,7 @@ export async function login(req, res) {
             });
         }
 
-        
+
         if (!configData.JWT_SECRET) {
             console.error("CRITICAL: JWT_SECRET is missing in login configuration!");
             return res.status(500).json({ success: false, message: "Internal server error" });
@@ -173,15 +173,15 @@ export async function login(req, res) {
             { expiresIn: '7d' }
         );
 
-        
+
         const cookieOptions = {
-            httpOnly: true, 
-            secure: process.env.NODE_ENV === "production", 
-            maxAge: 7 * 24 * 60 * 60 * 1000, 
-            sameSite: "strict" 
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production",
+            maxAge: 7 * 24 * 60 * 60 * 1000,
+            sameSite: "strict"
         };
 
-        
+
         res.cookie("token", token, cookieOptions);
 
         return res.status(200).json({
@@ -236,7 +236,7 @@ export async function getMe(req, res) {
 
     } catch (error) {
         console.error("GetMe Error:", error);
-        
+
         // अगर Mongoose को इनवैलिड Object ID मिलती है, तो उसे भी संभालें
         if (error.name === "CastError") {
             return res.status(400).json({
@@ -254,8 +254,8 @@ export async function getMe(req, res) {
 
 
 export async function verify(req, res) {
-    const {token} = req.query
-     try {
+    const { token } = req.query
+    try {
 
 
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
@@ -275,7 +275,7 @@ export async function verify(req, res) {
 
         await user.save();
 
-       const html = `
+        const html = `
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -367,7 +367,7 @@ export async function verify(req, res) {
 </html>
 `;
 
-return res.send(html);
+        return res.send(html);
     } catch (err) {
         return res.status(400).json({
             message: "Invalid or expired token",
@@ -376,3 +376,23 @@ return res.send(html);
         })
     }
 }
+
+
+
+export async function logout(req, res) {
+    try {
+
+        res.clearCookie("token", {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production",
+            sameSite: "strict"
+        });
+
+        return res.status(200).json({
+            success: true,
+            message: "Logged out successfully from session thread"
+        });
+    } catch (error) {
+        error
+    }
+};
