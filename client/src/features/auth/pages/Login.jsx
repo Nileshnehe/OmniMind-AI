@@ -30,11 +30,11 @@ const Login = () => {
         localStorage.setItem('omnimind_token', backendResponse.data?.accessToken);
         navigate('/');
       } else {
-        // Handle success:false without an HTTP error (e.g. unverified email)
+        
         setError(backendResponse?.message || 'Login failed. Please try again.');
       }
     } catch (err) {
-      // HTTP 4xx / 5xx errors land here
+      
       const rawErrorMessageText =
         err.response?.data?.message ||
         err.response?.data?.error ||
