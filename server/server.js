@@ -1,13 +1,12 @@
-import {config} from "dotenv"
-config()
+import { configData } from "./src/config/config.js";
 
 import app from "./src/app.js";
 import connectDB from "./src/config/db.js";
+import { testAi } from "./src/services/ai.service.js";
 
+const PORT = configData.PORT
 
-const PORT = process.env.PORT
-
-
+testAi()
 const startServer = async () => {
     try {
         
