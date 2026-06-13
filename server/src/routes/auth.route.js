@@ -1,6 +1,6 @@
-import {Router} from "express"
+import { Router } from "express"
 import { loginValidator, registerValidator, validate } from "../validators/auth.validator.js"
-import { getMe, login, register, verify } from "../controllers/auth.controller.js"
+import { getMe, login, logout, register, verify } from "../controllers/auth.controller.js"
 import { authUser } from "../middleware/auth.middleware.js"
 
 const authRouter = Router()
@@ -8,6 +8,7 @@ const authRouter = Router()
 authRouter.post("/register", registerValidator, register)
 authRouter.post("/login", loginValidator, login)
 authRouter.get("/me", authUser, getMe)
+authRouter.post("/logout", logout)
 authRouter.get("/verify-email", verify)
 
 
