@@ -13,26 +13,62 @@ const Register = () => {
     const [showSuccessModal, setShowSuccessModal] = useState(false)
     const navigate = useNavigate()
 
+    // const handleRegister = async (e) => {
+    //   e.preventDefault();
+    //   setError('');
+
+    //   // Client-side quick empty fields validator check
+    //   if (!name.trim() || !email.trim() || !password.trim()) {
+    //     setError('All fields are compulsory!');
+    //     return;
+    //   }
+
+    //   try {
+    //     const data = await authServices.registerUser(name, email, password);
+
+    //     if (data.success) {
+    //       // ❌ Ganda Browser alert gayab. Ab seedhe custom component trigger hoga
+    //       setShowSuccessModal(true); 
+    //     }
+    //   } catch (err) {
+    //     setError(err.response?.data?.message || 'Something went wrong during signup.');
+    //   }
+    // };
     const handleRegister = async (e) => {
-      e.preventDefault();
-      setError('');
+        e.preventDefault();
+        setError('');
 
-      // Client-side quick empty fields validator check
-      if (!name.trim() || !email.trim() || !password.trim()) {
-        setError('All fields are compulsory!');
-        return;
-      }
-
-      try {
-        const data = await authServices.registerUser(name, email, password);
-        
-        if (data.success) {
-          // ❌ Ganda Browser alert gayab. Ab seedhe custom component trigger hoga
-          setShowSuccessModal(true); 
+        // Client-side quick empty fields check
+        if (!name.trim() || !email.trim() || !password.trim()) {
+            setError('All fields are compulsory!');
+            return;
         }
-      } catch (err) {
-        setError(err.response?.data?.message || 'Something went wrong during signup.');
-      }
+
+        try {
+            const data = await authServices.registerUser(name, email, password);
+
+            if (data.success) {
+                setShowSuccessModal(true);
+            }
+        } catch (err) {
+            console.error("Signup tracking error data:", err.response?.data);
+
+            // 🟢 DYNAMIC EXPRESS-VALIDATOR ARRAY HANDLING:
+            // 1. Pehle check karo kya express-validator ne 'errors' naam ka array bheja hai?
+            if (err.response?.data?.errors && Array.isArray(err.response.data.errors)) {
+                // Array ki sabse pehli error ka msg utha kar frontend status me set kar do
+                const backendValidationError = err.response.data.errors[0]?.msg;
+                setError(backendValidationError || 'Validation failed on server.');
+            }
+            // 2. Agar express-validator ka array nahi hai, toh purana controller message check karo
+            else if (err.response?.data?.message) {
+                setError(err.response.data.message);
+            }
+            // 3. Agar kuch bhi nahi mila, toh global ultimate fallback text error
+            else {
+                setError('Something went wrong during signup.');
+            }
+        }
     };
 
     return (
@@ -146,7 +182,7 @@ const Register = () => {
                         >
                             Get Started
                         </button>
-                        
+
                         <p className='text-ui-sm text-text-muted text-left mt-2 select-none font-medium'>
                             Already have an account?{' '}
                             <Link
