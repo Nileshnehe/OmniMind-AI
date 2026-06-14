@@ -393,6 +393,6 @@ export async function logout(req, res) {
             message: "Logged out successfully from session thread"
         });
     } catch (error) {
-        error
+        return res.status(500).json({ success: false, message: "Logout failed" });
     }
 };

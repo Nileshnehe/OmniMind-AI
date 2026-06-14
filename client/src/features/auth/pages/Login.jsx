@@ -13,36 +13,7 @@ const Login = () => {
 
   const navigate = useNavigate()
 
-  // const handleLogin = async (e) => {
-  //   e.preventDefault();
-  //   setError('');
-
-  //   if (!email.trim() || !password.trim()) {
-  //     setError('Please fill in all fields.');
-  //     return;
-  //   }
-
-  //   setLoading(true);
-  //   try {
-  //     const backendResponse = await authServices.loginUser(email, password);
-
-  //     if (backendResponse && backendResponse.success) {
-  //       localStorage.setItem('omnimind_token', backendResponse.data?.accessToken);
-  //       navigate('/');
-  //     } else {
-        
-  //       setError(backendResponse?.message || 'Login failed. Please try again.');
-  //     }
-  //   } catch (err) {
-      
-  //     const rawErrorMessageText =
-  //       err.response?.data?.message ||
-  //       err.response?.data?.error ||
-  //       'Invalid credentials. Please try again.';
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
+ 
 
  const handleLogin = async (e) => {
     e.preventDefault();

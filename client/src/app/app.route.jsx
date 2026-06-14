@@ -20,6 +20,15 @@ export const routes = createBrowserRouter([
         element: <PricingPlans />
     },
     {
+        // 🟢 FIX: Ab user direct URL par /dashboard likhega toh bhi crash nahi hoga!
+        path: '/dashboard', 
+        element: (
+            <ProtectedRoute>
+                <Dashboard />
+            </ProtectedRoute>
+        ),
+    },
+    {
         path: '/',
         element: (
             <ProtectedRoute>
