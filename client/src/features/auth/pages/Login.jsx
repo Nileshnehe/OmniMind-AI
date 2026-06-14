@@ -9,41 +9,80 @@ const Login = () => {
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
   const [error, setError] = useState('')
-  const [loading, setLoading] = useState(false)
+  const [loading, setIsLoading] = useState(false)
 
   const navigate = useNavigate()
 
-  const handleLogin = async (e) => {
+  // const handleLogin = async (e) => {
+  //   e.preventDefault();
+  //   setError('');
+
+  //   if (!email.trim() || !password.trim()) {
+  //     setError('Please fill in all fields.');
+  //     return;
+  //   }
+
+  //   setLoading(true);
+  //   try {
+  //     const backendResponse = await authServices.loginUser(email, password);
+
+  //     if (backendResponse && backendResponse.success) {
+  //       localStorage.setItem('omnimind_token', backendResponse.data?.accessToken);
+  //       navigate('/');
+  //     } else {
+        
+  //       setError(backendResponse?.message || 'Login failed. Please try again.');
+  //     }
+  //   } catch (err) {
+      
+  //     const rawErrorMessageText =
+  //       err.response?.data?.message ||
+  //       err.response?.data?.error ||
+  //       'Invalid credentials. Please try again.';
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
+
+ const handleLogin = async (e) => {
     e.preventDefault();
-    setError('');
+    setError(''); // Purani errors clear karo
 
     if (!email.trim() || !password.trim()) {
-      setError('Please fill in all fields.');
-      return;
+        setError('Please enter both email and password!');
+        return;
     }
 
-    setLoading(true);
     try {
-      const backendResponse = await authServices.loginUser(email, password);
+        setIsLoading(true);
+        const data = await authServices.loginUser(email, password);
 
-      if (backendResponse && backendResponse.success) {
-        localStorage.setItem('omnimind_token', backendResponse.data?.accessToken);
-        navigate('/');
-      } else {
-        
-        setError(backendResponse?.message || 'Login failed. Please try again.');
-      }
+        if (data.success) {
+            // Agar tumhara path array routes me '/' hai toh '/' par navigate karo
+            navigate('/'); 
+        }
     } catch (err) {
-      
-      const rawErrorMessageText =
-        err.response?.data?.message ||
-        err.response?.data?.error ||
-        'Invalid credentials. Please try again.';
-    } finally {
-      setLoading(false);
-    }
-  };
+        console.error("Login catching pipeline data:", err.response?.data);
 
+        // 🟢 FIXED DYNAMIC ERROR HANDLER FOR EXPRESS-VALIDATOR:
+        // 1. Agar express-validator ka array aaya hai, toh pehla exact rule error dikhao
+        if (err.response?.data?.errors && Array.isArray(err.response.data.errors)) {
+            const backendValidationError = err.response.data.errors[0]?.msg;
+            setError(backendValidationError || 'Validation failed on server.');
+        } 
+        // 2. Agar standard controller message aaya hai (jaise "Invalid email or password")
+        else if (err.response?.data?.message) {
+            setError(err.response.data.message);
+        } 
+        // 3. Fallback generic technical alert
+        else {
+            setError('Something went wrong during login.');
+        }
+    } finally {
+        setIsLoading(false);
+    }
+};
+ 
   return (
 
     <div className='min-h-screen w-full flex flex-col lg:flex-row bg-bg-page dark:bg-[#0D0E15] transition-colors duration-200'>
