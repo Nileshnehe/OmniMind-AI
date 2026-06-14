@@ -1,202 +1,130 @@
-// src/features/auth/pages/Register.jsx
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router'
-import { authServices } from '../services/auth.service'
-import RegisterSuccessModal from './RegisterSuccessModal' // 🟢 FIX: Yeh line miss ho gayi thi bhei!
+import { useAuth } from '../../../hooks/useAuth' // 🟢 LINKED CUSTOM AUTH HOOK
+import RegisterSuccessModal from './RegisterSuccessModal'
 
 const Register = () => {
     const [name, setName] = useState('')
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
     const [showPassword, setShowPassword] = useState(false)
-    const [error, setError] = useState('')
-    const [showSuccessModal, setShowSuccessModal] = useState(false)
+    const [validationError, setValidationError] = useState('')
+
+    // 🟢 Destructure global variables from custom manager hook
+    const { loading, error, register, registerSuccess, resetRegisterFlag, clearErrors } = useAuth();
     const navigate = useNavigate()
 
-    // const handleRegister = async (e) => {
-    //   e.preventDefault();
-    //   setError('');
+    useEffect(() => {
+        clearErrors();
+        setValidationError('');
+        resetRegisterFlag();
+    }, []);
 
-    //   // Client-side quick empty fields validator check
-    //   if (!name.trim() || !email.trim() || !password.trim()) {
-    //     setError('All fields are compulsory!');
-    //     return;
-    //   }
+    const handleRegister = (e) => {
+      e.preventDefault();
+      setValidationError('');
+      clearErrors();
 
-    //   try {
-    //     const data = await authServices.registerUser(name, email, password);
+      // Core frontend validation check layer
+      if (!name.trim() || !email.trim() || !password.trim()) {
+        setValidationError('All fields are compulsory!');
+        return;
+      }
+      if (password.length < 6) {
+        setValidationError('Password must be at least 6 characters long!');
+        return;
+      }
 
-    //     if (data.success) {
-    //       // ❌ Ganda Browser alert gayab. Ab seedhe custom component trigger hoga
-    //       setShowSuccessModal(true); 
-    //     }
-    //   } catch (err) {
-    //     setError(err.response?.data?.message || 'Something went wrong during signup.');
-    //   }
-    // };
-    const handleRegister = async (e) => {
-        e.preventDefault();
-        setError('');
-
-        // Client-side quick empty fields check
-        if (!name.trim() || !email.trim() || !password.trim()) {
-            setError('All fields are compulsory!');
-            return;
-        }
-
-        try {
-            const data = await authServices.registerUser(name, email, password);
-
-            if (data.success) {
-                setShowSuccessModal(true);
-            }
-        } catch (err) {
-            console.error("Signup tracking error data:", err.response?.data);
-
-            // 🟢 DYNAMIC EXPRESS-VALIDATOR ARRAY HANDLING:
-            // 1. Pehle check karo kya express-validator ne 'errors' naam ka array bheja hai?
-            if (err.response?.data?.errors && Array.isArray(err.response.data.errors)) {
-                // Array ki sabse pehli error ka msg utha kar frontend status me set kar do
-                const backendValidationError = err.response.data.errors[0]?.msg;
-                setError(backendValidationError || 'Validation failed on server.');
-            }
-            // 2. Agar express-validator ka array nahi hai, toh purana controller message check karo
-            else if (err.response?.data?.message) {
-                setError(err.response.data.message);
-            }
-            // 3. Agar kuch bhi nahi mila, toh global ultimate fallback text error
-            else {
-                setError('Something went wrong during signup.');
-            }
-        }
+      // Trigger standard thunk parameter flow
+      register(name, email, password);
     };
 
     return (
         <div className='min-h-screen w-full flex flex-col lg:flex-row bg-bg-page dark:bg-[#0D0E15] transition-colors duration-200 relative'>
 
-            {/* Success popup modal rendered globally inside parent element wrapper layout */}
-            {showSuccessModal && (
+            {/* Success popup modal visibility is handled via global registerSuccess state token */}
+            {registerSuccess && (
                 <RegisterSuccessModal
                     email={email}
                     onConfirm={() => {
-                        setShowSuccessModal(false);
-                        navigate('/login'); // Redirect safely to login page panel boundary context
+                        resetRegisterFlag();
+                        navigate('/login'); 
                     }}
                 />
             )}
 
-            {/* LEFT FRAME PANEL: Brand Pitch */}
+            {/* LEFT PANEL */}
             <div className='flex-1 flex flex-col justify-center items-center p-8 bg-surface-hover/20 dark:bg-bg-card/30 border-b lg:border-b-0 lg:border-r border-border dark:border-[#2D3042] text-center'>
                 <div className='max-w-md select-none animate-fade-in'>
-                    <h1 className='text-display font-bold text-brand dark:text-[#7B6AFF] mb-4 tracking-tight'>
-                        OmniMind AI
-                    </h1>
+                    <h1 className='text-display font-bold text-brand dark:text-[#7B6AFF] mb-4 tracking-tight'>OmniMind AI</h1>
                     <p className='text-body-lg text-text-muted font-medium px-4 max-w-sm mx-auto'>
                         Your personal AI workspace. Ask questions, optimize code, and manage knowledge graph interactions in real-time just like ChatGPT.
                     </p>
                 </div>
             </div>
 
-            {/* RIGHT FRAME PANEL: Sign-up Interactive Content Block Wrapper Form Layout */}
+            {/* RIGHT PANEL */}
             <div className='flex-1 flex justify-center items-center p-6 md:p-12'>
                 <div className='w-full max-w-md bg-bg-card dark:bg-[#161722] border border-border dark:border-[#2D3042] rounded-2xl p-6 md:p-8 shadow-xl transition-all duration-300'>
-
                     <form onSubmit={handleRegister} className='flex flex-col gap-5'>
                         <div>
-                            <h2 className='text-h2 font-bold text-text-primary tracking-wide text-left'>
-                                Create Account
-                            </h2>
-                            <p className='text-ui-sm text-text-muted mt-1 text-left'>
-                                Join OmniMind to build your semantic knowledge graph.
-                            </p>
+                            <h2 className='text-h2 font-bold text-text-primary tracking-wide text-left'>Create Account</h2>
+                            <p className='text-ui-sm text-text-muted mt-1 text-left'>Join OmniMind to build your semantic knowledge graph.</p>
                         </div>
 
-                        {error && (
-                            <div className='p-3 bg-red-500/10 border border-red-500/20 text-red-500 rounded-xl text-ui-sm font-medium text-left'>
-                                {error}
+                        {/* Error output rendering combining client side or server validation hooks */}
+                        {(validationError || error) && (
+                            <div className='p-3 bg-red-500/10 border border-red-500/20 text-red-500 rounded-xl text-ui-sm font-medium text-left animate-fade-in'>
+                                {validationError || error}
                             </div>
                         )}
 
-                        {/* Input Field Area: Full Name */}
+                        {/* Inputs elements mapping */}
                         <div className='flex flex-col gap-1.5 text-left'>
                             <label className='text-overline text-text-muted uppercase font-semibold'>Full Name</label>
                             <div className='flex items-center gap-3 bg-bg-page dark:bg-[#0D0E15] border border-border dark:border-[#2D3042] focus-within:border-brand rounded-xl px-3.5 py-3 transition-all duration-200'>
-                                <svg className='w-5 h-5 text-text-muted opacity-70 flex-shrink-0' xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
-                                    <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
-                                </svg>
-                                <input
-                                    type="text"
-                                    value={name}
-                                    onChange={(e) => setName(e.target.value)}
-                                    placeholder="Nilesh Nehe"
-                                    className='flex-1 bg-transparent text-text-primary text-[15px] outline-none placeholder:text-text-muted/40 font-medium'
-                                />
+                                <svg className='w-5 h-5 text-text-muted opacity-70 flex-shrink-0' xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" /></svg>
+                                <input type="text" value={name} onChange={(e) => setName(e.target.value)} placeholder="Nilesh Nehe" disabled={loading} className='flex-1 bg-transparent text-text-primary text-[15px] outline-none placeholder:text-text-muted/40 font-medium disabled:opacity-60' />
                             </div>
                         </div>
 
-                        {/* Input Field Area: Email */}
                         <div className='flex flex-col gap-1.5 text-left'>
                             <label className='text-overline text-text-muted uppercase font-semibold'>Email Address</label>
                             <div className='flex items-center gap-3 bg-bg-page dark:bg-[#0D0E15] border border-border dark:border-[#2D3042] focus-within:border-brand rounded-xl px-4 py-3.5 transition-all duration-200'>
-                                <svg className='w-5 h-5 text-text-muted opacity-70 flex-shrink-0' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth='2' d='M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z' />
-                                </svg>
-                                <input
-                                    type="email"
-                                    value={email}
-                                    onChange={(e) => setEmail(e.target.value)}
-                                    placeholder="nilesh@example.com"
-                                    className='flex-1 bg-transparent text-text-primary text-[15px] outline-none placeholder:text-text-muted/40 font-medium'
-                                />
+                                <svg className='w-5 h-5 text-text-muted opacity-70 flex-shrink-0' fill='none' stroke='currentColor' viewBox='0 0 24 24'><path strokeLinecap="round" strokeLinejoin="round" strokeWidth='2' d='M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z' /></svg>
+                                <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="nilesh@example.com" disabled={loading} className='flex-1 bg-transparent text-text-primary text-[15px] outline-none placeholder:text-text-muted/40 font-medium disabled:opacity-60' />
                             </div>
                         </div>
 
-                        {/* Input Field Area: Password */}
                         <div className='flex flex-col gap-1.5 text-left'>
                             <label className='text-overline text-text-muted uppercase font-semibold'>Password</label>
                             <div className='flex items-center gap-3 bg-bg-page dark:bg-[#0D0E15] border border-border dark:border-[#2D3042] focus-within:border-brand rounded-xl px-4 py-3.5 transition-all duration-200 relative'>
-                                <svg className='w-5 h-5 text-text-muted opacity-70 flex-shrink-0' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth='2' d='M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z' />
-                                </svg>
-                                <input
-                                    type={showPassword ? 'text' : 'password'}
-                                    value={password}
-                                    onChange={(e) => setPassword(e.target.value)}
-                                    placeholder="••••••••"
-                                    className='flex-1 bg-transparent text-text-primary text-[15px] outline-none placeholder:text-text-muted/40 font-medium tracking-wide'
-                                />
-                                <button
-                                    type="button"
-                                    onClick={() => setShowPassword(!showPassword)}
-                                    className='text-ui-sm text-brand font-semibold hover:text-brand/80 active:scale-95 transition-all outline-none focus:underline pr-1 cursor-pointer'
-                                >
-                                    {showPassword ? 'Hide' : 'Show'}
-                                </button>
+                                <svg className='w-5 h-5 text-text-muted opacity-70 flex-shrink-0' fill='none' stroke='currentColor' viewBox='0 0 24 24'><path strokeLinecap="round" strokeLinejoin="round" strokeWidth='2' d='M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z' /></svg>
+                                <input type={showPassword ? 'text' : 'password'} value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••••" disabled={loading} className='flex-1 bg-transparent text-text-primary text-[15px] outline-none placeholder:text-text-muted/40 font-medium tracking-wide disabled:opacity-60' />
+                                <button type="button" onClick={() => setShowPassword(!showPassword)} disabled={loading} className='text-ui-sm text-brand font-semibold hover:text-brand/80 active:scale-95 transition-all outline-none pr-1 cursor-pointer disabled:opacity-50'>{showPassword ? 'Hide' : 'Show'}</button>
                             </div>
                         </div>
 
-                        {/* Form Submit Button Container */}
+                        {/* Submit Action handler synced with loading thunk state parameter */}
                         <button
                             type="submit"
-                            className='w-full mt-2 bg-brand dark:bg-[#7B6AFF] hover:opacity-95 text-white font-semibold text-[15px] h-12 rounded-xl cursor-pointer transition-all active:scale-[0.99] shadow-md flex items-center justify-center'
+                            disabled={loading}
+                            className={`w-full mt-2 bg-brand dark:bg-[#7B6AFF] text-white font-semibold text-[15px] h-12 rounded-xl transition-all shadow-md flex items-center justify-center gap-2 ${loading ? 'opacity-80 cursor-not-allowed' : 'hover:opacity-95 cursor-pointer active:scale-[0.99]'}`}
                         >
-                            Get Started
+                            {loading ? (
+                                <>
+                                    <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                                    <span>Registering...</span>
+                                </>
+                            ) : "Get Started"}
                         </button>
-
+                        
                         <p className='text-ui-sm text-text-muted text-left mt-2 select-none font-medium'>
-                            Already have an account?{' '}
-                            <Link
-                                to="/login"
-                                className='text-brand dark:text-[#7B6AFF] font-bold hover:underline transition-all duration-200 ml-1'
-                            >
-                                Log in
-                            </Link>
+                            Already have an account? <Link to="/login" className='text-brand dark:text-[#7B6AFF] font-bold hover:underline transition-all duration-200 ml-1'>Log in</Link>
                         </p>
                     </form>
-
                 </div>
             </div>
-
         </div>
     )
 }
