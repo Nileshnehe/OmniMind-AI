@@ -1,7 +1,7 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { authServices } from '../../features/auth/services/auth.service';
 
-//  Async Thunk for Register Pipeline
+
 export const registerUserThunk = createAsyncThunk(
   'auth/registerUser',
   async ({ username, email, password }, { rejectWithValue }) => {
@@ -27,14 +27,28 @@ export const loginUserThunk = createAsyncThunk(
   }
 );
 
+//  Async Thunk for Session Check Pipeline
+export const getMeThunk = createAsyncThunk(
+  'auth/getMe',
+  async (_, { rejectWithValue }) => {
+    try {
+      const data = await authServices.getMeProfile();
+      return data;
+    } catch (err) {
+      return rejectWithValue(err.response?.data || { message: 'Not authenticated' });
+    }
+  }
+);
+
 const authSlice = createSlice({
   name: 'auth',
   initialState: {
     user: null,
     isAuthenticated: false,
-    loading: false, // Central synchronized loader hook
+    loading: false, 
+    isCheckingSession: true, 
     error: null,
-    registerSuccess: false, // Success modal toggle flag helper
+    registerSuccess: false, 
   },
   reducers: {
     clearAuthErrors: (state) => {
@@ -66,7 +80,7 @@ const authSlice = createSlice({
         }
       })
 
-      
+      /* ================= LOGIN UTILITY CASES ================= */
       .addCase(loginUserThunk.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -84,6 +98,22 @@ const authSlice = createSlice({
         } else {
           state.error = action.payload?.message || 'Invalid email credentials or password.';
         }
+      }) 
+
+      /* ================= GET ME (SESSION CHECK) CASES ================= */
+      .addCase(getMeThunk.pending, (state) => {
+        state.isCheckingSession = true; // Global app load spinner ON
+      })
+      .addCase(getMeThunk.fulfilled, (state, action) => {
+        state.isCheckingSession = false; // Global app load spinner OFF
+        state.isAuthenticated = true;
+        
+        state.user = action.payload?.user || action.payload?.data || null;
+      })
+      .addCase(getMeThunk.rejected, (state) => {
+        state.isCheckingSession = false; // Global app load spinner OFF
+        state.isAuthenticated = false;
+        state.user = null;
       });
   },
 });
