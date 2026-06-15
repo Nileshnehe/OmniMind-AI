@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router';
-import { useAuth } from '../../../hooks/useAuth'; // 🟢 LINKED CUSTOM AUTH HOOK
+import { useAuth } from '../../../hooks/useAuth'; 
 
 const Login = () => {
     const [email, setEmail] = useState('');
@@ -8,18 +8,18 @@ const Login = () => {
     const [showPassword, setShowPassword] = useState(false);
     const [validationError, setValidationError] = useState('');
 
-    // 🟢 Connect selectors using cleanly encapsulated hook manager parameters
+    
     const { loading, error, login, isAuthenticated, clearErrors } = useAuth();
     const navigate = useNavigate();
 
     useEffect(() => {
         clearErrors();
         setValidationError('');
-    }, []);
+    }, [clearErrors]);
 
     useEffect(() => {
         if (isAuthenticated) {
-            navigate('/'); // Redirects safely to base layout routing table index
+            navigate('/'); 
         }
     }, [isAuthenticated, navigate]);
 
@@ -33,7 +33,7 @@ const Login = () => {
             return;
         }
 
-        // Trigger safe thunk execution parameter block via Redux global ecosystem
+        
         login(email, password);
     };
 
