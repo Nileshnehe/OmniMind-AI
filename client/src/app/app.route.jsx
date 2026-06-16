@@ -4,24 +4,32 @@ import Dashboard from '../features/chat/layout/Dashboard'
 import Login from '../features/auth/pages/Login'
 import PricingPlans from '../features/chat/components/PricingPage'
 import ProtectedRoute from './ProtectedRoute'
+import PublicRoute from './PublicRoute'
 
 export const routes = createBrowserRouter([
 
     {
+
         path: '/login',
-        element: <Login />
+        element:
+            <PublicRoute>
+                <Login />
+            </PublicRoute>
     },
     {
         path: '/register',
-        element: <Register />
+        element:
+            <PublicRoute>
+                <Register />
+            </PublicRoute>
     },
     {
         path: '/price',
         element: <PricingPlans />
     },
     {
-        // 🟢 FIX: Ab user direct URL par /dashboard likhega toh bhi crash nahi hoga!
-        path: '/dashboard', 
+
+        path: '/dashboard',
         element: (
             <ProtectedRoute>
                 <Dashboard />
