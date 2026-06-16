@@ -5,6 +5,7 @@ import ChatInput from '../components/ChatInput'
 import { authServices } from '../../auth/services/auth.service'
 import { useNavigate } from 'react-router'
 import { useEffect } from 'react'
+import { useAuth } from '../../../hooks/useAuth'
 import API from '../../../services/api'
 
 
@@ -17,6 +18,7 @@ const Dashboard = () => {
 
   const [input, setInput] = useState('')
 
+  const {user, isAuthenticate} = useAuth()
   const handleSendMessage = (userMessage) => {
 
     const updateMessage = [...messages, { sender: 'user', text: userMessage }];
