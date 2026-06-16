@@ -1,7 +1,7 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { authServices } from '../../features/auth/services/auth.service';
 
-
+// Async Thunk for Register Pipeline
 export const registerUserThunk = createAsyncThunk(
   'auth/registerUser',
   async ({ username, email, password }, { rejectWithValue }) => {
@@ -14,7 +14,7 @@ export const registerUserThunk = createAsyncThunk(
   }
 );
 
-//  Async Thunk for Login Pipeline
+// Async Thunk for Login Pipeline
 export const loginUserThunk = createAsyncThunk(
   'auth/loginUser',
   async ({ email, password }, { rejectWithValue }) => {
@@ -27,7 +27,7 @@ export const loginUserThunk = createAsyncThunk(
   }
 );
 
-//  Async Thunk for Session Check Pipeline
+// Async Thunk for Session Check Pipeline
 export const getMeThunk = createAsyncThunk(
   'auth/getMe',
   async (_, { rejectWithValue }) => {
@@ -36,6 +36,19 @@ export const getMeThunk = createAsyncThunk(
       return data;
     } catch (err) {
       return rejectWithValue(err.response?.data || { message: 'Not authenticated' });
+    }
+  }
+);
+
+// Async Thunk for Logout Pipeline
+export const logoutUserThunk = createAsyncThunk(
+  'auth/logoutUser',
+  async (_, { rejectWithValue }) => {
+    try {
+      const data = await authServices.logoutUser(); 
+      return data;
+    } catch (err) {
+      return rejectWithValue(err.response?.data || { message: 'Logout failed on server' });
     }
   }
 );
@@ -107,15 +120,31 @@ const authSlice = createSlice({
       .addCase(getMeThunk.fulfilled, (state, action) => {
         state.isCheckingSession = false; // Global app load spinner OFF
         state.isAuthenticated = true;
-        
         state.user = action.payload?.user || action.payload?.data || null;
       })
       .addCase(getMeThunk.rejected, (state) => {
         state.isCheckingSession = false; // Global app load spinner OFF
         state.isAuthenticated = false;
         state.user = null;
+      })
+
+      /* ================= LOGOUT UTILITY CASES ================= */
+      
+      .addCase(logoutUserThunk.pending, (state) => {
+        state.isAuthenticated = false;
+        state.user = null;
+      })
+      .addCase(logoutUserThunk.fulfilled, (state) => {
+        state.isAuthenticated = false;
+        state.user = null;
+        state.loading = false;
+      })
+      .addCase(logoutUserThunk.rejected, (state) => {
+        state.isAuthenticated = false;
+        state.user = null;
+        state.loading = false;
       });
-  },
+  }
 });
 
 export const { clearAuthErrors, resetRegisterStatus } = authSlice.actions;
