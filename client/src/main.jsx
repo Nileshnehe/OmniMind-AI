@@ -2,13 +2,17 @@ import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import App from './app/App'
 import { Provider } from 'react-redux'
-import {store} from './store/app.store'
+import { store } from './store/app.store'
 import { routes } from './app/app.route'
 import { RouterProvider } from 'react-router'
+import AuthWrapper from './features/chat/components/AuthWrapper'
 import './index.css'
 
 createRoot(document.getElementById('root')).render(
+
   <Provider store={store}>
-    <RouterProvider router={routes} />
+    <AuthWrapper>
+      <RouterProvider router={routes} />
+    </AuthWrapper>
   </Provider>
 )
