@@ -1,35 +1,11 @@
-import React from 'react'
+import React, { useState } from 'react'
 import userIcon from '../../../../assets/profile.svg'
 import moreVertIcon from '../../../../assets/morevert.svg'
-
-
 import UserDropdownMenu from './UserDropdownMenu'
-import { authServices } from '../../../auth/services/auth.service'
-import LogoutModal from './LogoutModal'
-import { useState } from 'react'
-import { useNavigate } from 'react-router'
 
 
-const UserProfileBlock = ({ isOpen, user }) => {
+const UserProfileBlock = ({ isOpen, user, onLogoutTrigger }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  
-  // ⚡ Modal visible toggle control state parameters
-  const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
-  const navigate = useNavigate();
-
-  // 🚀 ACTIVE REAL LOGOUT DISPATCH PROCESS:
-  const handleFinalLogout = async () => {
-    try {
-      const data = await authServices.logoutUser();
-      if (data.success) {
-        setIsLogoutModalOpen(false); // Modal close karo
-        navigate('/login'); // Login panel redirect jump
-      }
-    } catch (err) {
-      console.error("Logout validation crash track:", err);
-      alert("Something went wrong during logout.");
-    }
-  };
 
   return (
     <div className='relative w-full'>
@@ -39,20 +15,13 @@ const UserProfileBlock = ({ isOpen, user }) => {
         <UserDropdownMenu 
           user={user} 
           onLogout={() => {
-            setIsMenuOpen(false); // Dropdown menu ko pehle band karo
-            setIsLogoutModalOpen(true); // 🟢 STEP 3: Logout Modal popup trigger active karo!
+            setIsMenuOpen(false); 
+            onLogoutTrigger();    
           }}
         />
       )}
 
-      {/* 2. THE CONFIRMATION POPUP MODAL SCREEN */}
-      {isLogoutModalOpen && (
-        <LogoutModal 
-          user={user} // Pass complete profile token array metadata to access .email
-          onConfirm={handleFinalLogout} // Yes trigger action logic execution
-          onCancel={() => setIsLogoutModalOpen(false)} // No trigger collapse window
-        />
-      )}
+      {/* 🟢 NOTE: Modal ab yahan render nahi hoga, wo Sidebar sambhal raha hai */}
 
       {/* Profile Row Main Layer layout */}
       <div className={`flex items-center w-full p-2 rounded-xl text-text-primary hover:bg-surface-hover/60 cursor-pointer group transition-all duration-200 select-none

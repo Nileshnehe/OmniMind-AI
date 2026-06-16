@@ -1,18 +1,31 @@
-import React from 'react'
-import RecentActivity from './RecentActivity'
-import RecentChat from './RecentChat'
-import UserProfileBlock from './UserProfileBlock'
+import { useNavigate } from 'react-router';
+import React, { useState } from 'react'; 
+import RecentActivity from './RecentActivity';
+import RecentChat from './RecentChat';
+import UserProfileBlock from './UserProfileBlock';
+import LogoutModal from './LogoutModal'; 
+import { useAuth } from '../../../../hooks/useAuth';
+
+import toggleIcon from '../../../../assets/sideNavigation.svg';
+import newChatIcon from '../../../../assets/rename.svg';
+import downArrowIcon from '../../../../assets/arrowdown.svg';
+import searchIcon from '../../../../assets/search.svg';
+import moreVertIcon from '../../../../assets/morevert.svg';
 
 
-import toggleIcon from '../../../../assets/sideNavigation.svg'
-import newChatIcon from '../../../../assets/rename.svg'
-import downArrowIcon from '../../../../assets/arrowdown.svg'
-import searchIcon from '../../../../assets/search.svg'
-import moreVertIcon from '../../../../assets/morevert.svg'
+const Sidebar = ({ isOpen, onToggle }) => { 
+  const { logout, user } = useAuth(); 
+    const navigate = useNavigate();
+  
+  const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
 
-
-const Sidebar = ({ isOpen, onToggle, user }) => {
-  console.log("Sidebar props user:", user);
+  // Actual confirm logout handler
+  const handleConfirmLogout = async () => {
+      await logout(); // Redux aur backend clean karega
+      setIsLogoutModalOpen(false); // Modal close karega
+      navigate('/login')
+  };
+  
   return (
     <div className={`h-screen bg-bg-card dark:bg-[#161722] flex flex-col py-4 px-2 border-r border-border dark:border-[#2D3042] select-none transition-all duration-300 ease-in-out items-center
       ${isOpen ? 'w-80' : 'w-16'}
@@ -20,7 +33,6 @@ const Sidebar = ({ isOpen, onToggle, user }) => {
 
       {/* Sidebar Top */}
       <div className='flex flex-col flex-shrink-0 mb-4 w-full items-center'>
-
         {/* Logo + Toggle Section */}
         <div className={`text-text-primary font-bold flex items-center mb-5 h-10 w-full leading-6 
           ${isOpen ? 'justify-between pr-2 pl-2' : 'justify-center'}
@@ -41,16 +53,11 @@ const Sidebar = ({ isOpen, onToggle, user }) => {
 
         {/* Navigation Menu */}
         <div className='flex flex-col gap-1.5 px-1 w-full items-center'>
-
           {/* Button 1: New Chat */}
           <button className={`flex items-center h-11 text-text-primary rounded-lg cursor-pointer transition-all duration-200 text-[14px] font-medium group w-full flex-shrink-0
             ${isOpen ? 'px-3 gap-3.5 justify-start bg-surface-hover/50 hover:bg-surface-hover' : 'p-0 justify-center hover:bg-surface-hover/80'}
           `}>
-            <img
-              src={newChatIcon}
-              alt="new-chat"
-              className='w-5 h-5 min-w-[20px] min-h-[20px] dark:invert opacity-70 group-hover:opacity-100 transition-opacity object-contain flex-shrink-0'
-            />
+            <img src={newChatIcon} alt="new-chat" className='w-5 h-5 min-w-[20px] min-h-[20px] dark:invert opacity-70 group-hover:opacity-100 transition-opacity object-contain flex-shrink-0' />
             {isOpen && <span className='truncate animate-fade-in'>New Chat</span>}
           </button>
 
@@ -58,14 +65,9 @@ const Sidebar = ({ isOpen, onToggle, user }) => {
           <button className={`flex items-center h-11 text-text-primary rounded-lg cursor-pointer transition-all duration-200 text-[14px] font-medium group w-full flex-shrink-0
             ${isOpen ? 'px-3 gap-3.5 justify-start hover:bg-surface-hover' : 'p-0 justify-center hover:bg-surface-hover/80'}
           `}>
-            <img
-              src={searchIcon}
-              alt="search"
-              className='w-5 h-5 min-w-[20px] min-h-[20px] dark:invert opacity-70 group-hover:opacity-100 transition-opacity object-contain flex-shrink-0'
-            />
+            <img src={searchIcon} alt="search" className='w-5 h-5 min-w-[20px] min-h-[20px] dark:invert opacity-70 group-hover:opacity-100 transition-opacity object-contain flex-shrink-0' />
             {isOpen && <span className='truncate animate-fade-in'>Search</span>}
           </button>
-
         </div>
       </div>
 
@@ -74,62 +76,30 @@ const Sidebar = ({ isOpen, onToggle, user }) => {
         <RecentActivity title='Recent' icon={downArrowIcon} isOpen={isOpen}>
           <RecentChat title="Logo Design for OmniMind AI" icon={moreVertIcon} />
           <RecentChat title="AI Tool Name Ideas" icon={moreVertIcon} />
-          <RecentChat title="Logo Design for OmniMind AI" icon={moreVertIcon} />
-          <RecentChat title="AI Tool Name Ideas" icon={moreVertIcon} />
-          <RecentChat title="Logo Design for OmniMind AI" icon={moreVertIcon} />
-          <RecentChat title="AI Tool Name Ideas" icon={moreVertIcon} />
-          <RecentChat title="Logo Design for OmniMind AI" icon={moreVertIcon} />
-          <RecentChat title="AI Tool Name Ideas" icon={moreVertIcon} />
-          <RecentChat title="Logo Design for OmniMind AI" icon={moreVertIcon} />
-          <RecentChat title="AI Tool Name Ideas" icon={moreVertIcon} />
-          <RecentChat title="Logo Design for OmniMind AI" icon={moreVertIcon} />
-          <RecentChat title="AI Tool Name Ideas" icon={moreVertIcon} />
-          <RecentChat title="Logo Design for OmniMind AI" icon={moreVertIcon} />
-          <RecentChat title="AI Tool Name Ideas" icon={moreVertIcon} />
-          <RecentChat title="Logo Design for OmniMind AI" icon={moreVertIcon} />
-          <RecentChat title="AI Tool Name Ideas" icon={moreVertIcon} />
-          <RecentChat title="Logo Design for OmniMind AI" icon={moreVertIcon} />
-          <RecentChat title="AI Tool Name Ideas" icon={moreVertIcon} />
-          <RecentChat title="Logo Design for OmniMind AI" icon={moreVertIcon} />
-          <RecentChat title="AI Tool Name Ideas" icon={moreVertIcon} />
-          <RecentChat title="Logo Design for OmniMind AI" icon={moreVertIcon} />
-          <RecentChat title="AI Tool Name Ideas" icon={moreVertIcon} />
-          <RecentChat title="Logo Design for OmniMind AI" icon={moreVertIcon} />
-          <RecentChat title="AI Tool Name Ideas" icon={moreVertIcon} />
-          <RecentChat title="Logo Design for OmniMind AI" icon={moreVertIcon} />
-          <RecentChat title="AI Tool Name Ideas" icon={moreVertIcon} />
-          <RecentChat title="Logo Design for OmniMind AI" icon={moreVertIcon} />
-          <RecentChat title="AI Tool Name Ideas" icon={moreVertIcon} />
-          <RecentChat title="Logo Design for OmniMind AI" icon={moreVertIcon} />
-          <RecentChat title="AI Tool Name Ideas" icon={moreVertIcon} />
-          <RecentChat title="Logo Design for OmniMind AI" icon={moreVertIcon} />
-          <RecentChat title="AI Tool Name Ideas" icon={moreVertIcon} />
-          <RecentChat title="Logo Design for OmniMind AI" icon={moreVertIcon} />
-          <RecentChat title="AI Tool Name Ideas" icon={moreVertIcon} />
-          <RecentChat title="Logo Design for OmniMind AI" icon={moreVertIcon} />
-          <RecentChat title="AI Tool Name Ideas" icon={moreVertIcon} />
-          <RecentChat title="Logo Design for OmniMind AI" icon={moreVertIcon} />
-          <RecentChat title="AI Tool Name Ideas" icon={moreVertIcon} />
-          <RecentChat title="Logo Design for OmniMind AI" icon={moreVertIcon} />
-          <RecentChat title="AI Tool Name Ideas" icon={moreVertIcon} />
-          <RecentChat title="Logo Design for OmniMind AI" icon={moreVertIcon} />
-          <RecentChat title="AI Tool Name Ideas" icon={moreVertIcon} />
-          <RecentChat title="Logo Design for OmniMind AI" icon={moreVertIcon} />
-          <RecentChat title="AI Tool Name Ideas" icon={moreVertIcon} />
-          <RecentChat title="Logo Design for OmniMind AI" icon={moreVertIcon} />
-          <RecentChat title="AI Tool Name Ideas" icon={moreVertIcon} />
-          <RecentChat title="Logo Design for OmniMind AI" icon={moreVertIcon} />
-          <RecentChat title="AI Tool Name Ideas" icon={moreVertIcon} />
         </RecentActivity>
       </div>
 
       {/* Sidebar Bottom */}
       <div className='mt-auto pt-2 border-t border-border/40 flex-shrink-0 w-full px-1'>
-        <UserProfileBlock isOpen={isOpen} user={user} />
+        
+        <UserProfileBlock 
+            isOpen={isOpen} 
+            user={user} 
+            onLogoutTrigger={() => setIsLogoutModalOpen(true)} 
+        />
       </div>
+
+      
+      {isLogoutModalOpen && (
+        <LogoutModal 
+          user={user}
+          onConfirm={handleConfirmLogout}
+          onCancel={() => setIsLogoutModalOpen(false)}
+        />
+      )}
 
     </div>
   )
 }
 
-export default Sidebar
+export default Sidebar;
