@@ -1,28 +1,30 @@
 import React, { useState } from 'react'
+import { useEffect } from 'react'
+import { useNavigate } from 'react-router'
 import Sidebar from '../workspace/components/Sidebar'
 import toggleIcon from '../../../assets/sideNavigation.svg'
 import ChatInput from '../components/ChatInput'
 import { authServices } from '../../auth/services/auth.service'
-import { useNavigate } from 'react-router'
-import { useEffect } from 'react'
-import { useAuth } from '../../../hooks/useAuth'
+import { useChat } from '../hooks/useChat'
+
 import API from '../../../services/api'
 
 
 const Dashboard = () => {
 
   const [isSidebarOpen, setIsSidebarOpen] = useState(true)
-  const [messages, setMessages] = useState([])
   const [userProfile, setUserProfile] = useState({ username: "Loading..." })
   const navigate = useNavigate()
 
   const [input, setInput] = useState('')
 
-  const {user, isAuthenticate} = useAuth()
+  const { messages, isAgentTyping, sendMessage } = useChat();
+
+
   const handleSendMessage = (userMessage) => {
 
-    const updateMessage = [...messages, { sender: 'user', text: userMessage }];
-    setMessages(updateMessage);
+    // const updateMessage = [...messages, { sender: 'user', text: userMessage }];
+    // setMessages(updateMessage);
 
     setTimeout(() => {
       setMessages([...updateMessage, { sender: 'ai', text: `This is a smart response from OmniMind AI for: "${userMessage}"` }])
@@ -32,25 +34,24 @@ const Dashboard = () => {
   useEffect(() => {
     const fetchUserData = async () => {
       try {
-        
+
         const response = await API.get('/auth/me');
 
-        console.log("=== DASHBOARD API RESPONSE RAW ===", response.data);
-
-        
         if (response.data && response.data.success) {
-          
+
           setUserProfile(response.data.data || response.data.user);
         }
       } catch (err) {
         console.error("Profile payload session failure:", err);
-        
+
         navigate('/login');
       }
     };
 
     fetchUserData();
   }, [navigate]);
+
+
 
   return (
     <div className='h-screen w-full flex bg-bg-page dark:bg-[#0D0E15] overflow-hidden relative transition-colors duration-200'
