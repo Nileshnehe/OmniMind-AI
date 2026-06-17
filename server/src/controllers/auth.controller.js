@@ -19,7 +19,7 @@ export async function register(req, res) {
             });
         }
 
-        // 1. Create the user
+        
         const user = await userModel.create({ username, email, password });
 
         // 2. Validate secret exists before signing
@@ -28,14 +28,14 @@ export async function register(req, res) {
             return res.status(500).json({ success: false, message: "Internal server configuration error" });
         }
 
-        // 3. Sign Token
+        
         const emailVerificationToken = jwt.sign(
             { email: user.email },
             configData.JWT_SECRET,
-            { expiresIn: '1d' } // Good practice: add an expiration!
+            { expiresIn: '1d' } 
         );
 
-        // 4. Send Email
+        
         await sendEmail({
             to: email,
             subject: "Welcome to Omnimind AI",
@@ -166,7 +166,7 @@ export async function login(req, res) {
             return res.status(500).json({ success: false, message: "Internal server error" });
         }
 
-        // 5. JWT टोकन जनरेट करें
+        
         const token = jwt.sign(
             { id: user._id, username: user.username },
             configData.JWT_SECRET,
@@ -205,7 +205,7 @@ export async function login(req, res) {
 
 export async function getMe(req, res) {
     try {
-        // 1. सेफ्टी चेक: सुनिश्चित करें कि मिडलवेयर ने req.user सेट किया है
+        
         if (!req.user || !req.user.id) {
             return res.status(401).json({
                 message: "Unauthorized access. No user session found.",
@@ -216,7 +216,7 @@ export async function getMe(req, res) {
 
         const userId = req.user.id;
 
-        // 2. डेटाबेस से यूज़र ढूँढें (पासवर्ड छोड़कर)
+        
         const user = await userModel.findById(userId).select("-password");
 
         if (!user) {
@@ -227,7 +227,7 @@ export async function getMe(req, res) {
             });
         }
 
-        // 3. सफल रिस्पॉन्स भेजें
+        
         return res.status(200).json({
             message: "User details fetched successfully",
             success: true,
@@ -237,7 +237,7 @@ export async function getMe(req, res) {
     } catch (error) {
         console.error("GetMe Error:", error);
 
-        // अगर Mongoose को इनवैलिड Object ID मिलती है, तो उसे भी संभालें
+        
         if (error.name === "CastError") {
             return res.status(400).json({
                 success: false,
@@ -396,3 +396,5 @@ export async function logout(req, res) {
         return res.status(500).json({ success: false, message: "Logout failed" });
     }
 };
+
+
