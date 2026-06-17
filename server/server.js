@@ -1,18 +1,21 @@
 import { configData } from "./src/config/config.js";
+const PORT = configData.PORT
 
 import app from "./src/app.js";
 import connectDB from "./src/config/db.js";
 import { testAi } from "./src/services/ai.service.js";
+import http from "http"
+import { initSocket } from "./src/sockets/server.socket.js";
 
-const PORT = configData.PORT
 
-// testAi()
+const httpServer = http.createServer(app);
+initSocket(httpServer)
 const startServer = async () => {
     try {
         
         await connectDB()
 
-        app.listen(3000, () => {
+        httpServer.listen(3000, () => {
     console.log(`server is running on port 3000`)
 });
     } catch (error) {
