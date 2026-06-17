@@ -1,16 +1,15 @@
-// src/features/auth/components/AuthWrapper.jsx
 import React, { useEffect } from 'react';
 import { useAuth } from '../../../hooks/useAuth';
 
 const AuthWrapper = ({ children }) => {
     const { checkSession, isCheckingSession } = useAuth();
 
-    //  1. App khulte hi hamesha ek baar backend se session verify karega
+    
     useEffect(() => {
         checkSession();
     }, [checkSession]);
 
-    //  2. Jab tak API ka response nahi aata, Global Loading Screen dikhao
+   
     if (isCheckingSession) {
         return (
             <div className="min-h-screen w-full flex flex-col items-center justify-center bg-bg-page dark:bg-[#0D0E15]">
@@ -30,7 +29,7 @@ const AuthWrapper = ({ children }) => {
         );
     }
 
-    //  3. Agar checking complete ho gayi, toh normal website render kar do
+    
     return children;
 };
 
