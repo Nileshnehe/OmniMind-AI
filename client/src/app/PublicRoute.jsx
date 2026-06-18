@@ -3,10 +3,13 @@ import { Navigate } from 'react-router';
 import { useAuth } from '../hooks/useAuth';
 
 const PublicRoute = ({ children }) => {
-    const { isAuthenticated } = useAuth();
+    const { isAuthenticated, isCheckingSession, loading } = useAuth();
+
+    if (isCheckingSession || loading) {
+        return null;
+    }
 
     if (isAuthenticated) {
-
         return <Navigate to="/" replace />;
     }
 

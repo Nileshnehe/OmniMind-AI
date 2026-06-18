@@ -1,10 +1,16 @@
 import { Navigate } from 'react-router'
+import { useAuth } from '../hooks/useAuth'
 
 const ProtectedRoute = ({ children }) => {
-  const token = localStorage.getItem('omnimind_token')
 
-  if (!token) {
-    return <Navigate to="/login" replace />
+  const { isAuthenticated, isCheckingSession, loading } = useAuth();
+
+  if (isCheckingSession || loading) {
+    return null;
+  }
+
+  if (!isAuthenticated) {
+    return <Navigate to="/login" replace /> 
   }
 
   return children
