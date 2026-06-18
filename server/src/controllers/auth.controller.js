@@ -360,7 +360,7 @@ export async function verify(req, res) {
         </div>
         <h1>Email Verified Successfully!</h1>
         <p>Your email has been verified. You can now close this tab or head back to login to access your account.</p>
-        <a href="http://localhost:3000/login" class="btn">Go to Login</a>
+       
     </div>
 
 </body>
