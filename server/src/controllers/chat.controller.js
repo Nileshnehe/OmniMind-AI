@@ -6,37 +6,40 @@ export async function sendMessage(req, res) {
 
     const { message, chat: chatId } = req.body;
     console.log(req.body);
-    
 
-    
 
-    let title = null; let chat = null;
+
+
+    let title = null;
+    let chat = null;
+    let activeChatId = chatId;
 
     if (!chatId) {
         title = await generateChatTitle(message);
-        
-
         chat = await chatModel.create({
             user: req.user.id,
             title
         });
+        activeChatId = chat._id;
     }
 
     const userMessage = await messageModel.create({
-        chat: chatId || chat._id,
+        chat: activeChatId,
         content: message,
         role: "user"
     });
 
-    const messages = await messageModel.find({ chat: chatId });
+    const messages = await messageModel.find({
+        chat: activeChatId
+    }).sort({ createdAt: 1 });
 
-    const result = await generateResponse(message);
-    
+    const result = await generateResponse(messages);
 
-    
+
+
 
     const aiResponse = await messageModel.create({
-        chat: chatId || chat._id,
+        chat: activeChatId,
         content: result,
         role: "ai"
     });

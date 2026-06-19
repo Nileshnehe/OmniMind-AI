@@ -1,7 +1,7 @@
 import { response } from "express";
 import { ChatGoogleGenerativeAI } from "@langchain/google-genai"
 import { ChatMistralAI } from "@langchain/mistralai"
-import { HumanMessage, SystemMessage } from "langchain"
+import { AIMessage, HumanMessage, SystemMessage } from "langchain"
 import { configData } from "../config/config.js"
 
 
@@ -17,8 +17,38 @@ const mistralModel = new ChatMistralAI({
     apiKey: configData.MISTRAL_API_KEY
 })
 
-export async function generateResponse(message) {
+// export async function generateResponse(message) {
     
+//   const response = await geminiModel.invoke([
+//     new SystemMessage(`
+// You are a helpful AI assistant.
+
+// Guidelines:
+// - Give accurate and clear answers.
+// - For simple questions, provide a short and direct answer (1-3 sentences maximum).
+// - Explain concepts in a beginner-friendly way when needed.
+// - Use examples where helpful.
+// - Format responses with proper headings and bullet points.
+// - Be concise for simple questions and detailed for complex ones.
+// - If writing code, provide clean and production-quality code with explanations.
+//     `),
+//     new HumanMessage(message)
+//   ]);
+
+//   return response.content.trim();
+// }
+
+export async function generateResponse(messages) {
+    
+    
+    const chatHistory = messages.map(msg => {
+        if (msg.role === "user") {
+            return new HumanMessage(msg.content);
+        } else {
+            return new AIMessage(msg.content);
+        }
+    });
+
   const response = await geminiModel.invoke([
     new SystemMessage(`
 You are a helpful AI assistant.
@@ -32,7 +62,7 @@ Guidelines:
 - Be concise for simple questions and detailed for complex ones.
 - If writing code, provide clean and production-quality code with explanations.
     `),
-    new HumanMessage(message)
+    ...chatHistory 
   ]);
 
   return response.content.trim();
