@@ -3,7 +3,7 @@ const PORT = configData.PORT
 
 import app from "./src/app.js";
 import connectDB from "./src/config/db.js";
-import { testAi } from "./src/services/ai.service.js";
+
 import http from "http"
 import { initSocket } from "./src/sockets/server.socket.js";
 
