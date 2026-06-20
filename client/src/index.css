@@ -45,74 +45,90 @@
   --color-surface-hover: #222436;
 }
 
-/* --- Premium Custom Scrollbar System --- */
+/* ═══════════════════════════════════════════════════════════════════
+   Gemini-style Scrollbar System
+   Two utility classes:
+     .omnimind-scroller  — sidebar chat list
+     .omnimind-scrollbar — main chat message area
+   Both share the same look: invisible by default, thin + subtle on hover.
+═══════════════════════════════════════════════════════════════════ */
+
+/* ── Shared base mixin (applied to both classes) ──────────────────── */
+.omnimind-scrollbar,
 .omnimind-scroller {
-  overflow-y: auto;
-  /* Firefox Config */
-  scrollbar-width: none; /* Default me hidden */
+  /* Firefox: hidden by default, shown thin on hover via JS trick below */
+  scrollbar-width: thin;
+  scrollbar-color: transparent transparent;
   transition: scrollbar-color 0.3s ease;
 }
 
+/* Firefox: thumb appears on hover */
+.omnimind-scrollbar:hover,
 .omnimind-scroller:hover {
-  scrollbar-width: thin; /* Hover pe patla dikhega */
+  scrollbar-color: rgba(148, 153, 179, 0.25) transparent;
 }
 
-/* Chrome, Safari, Edge Controls */
+/* ── WebKit (Chrome, Edge, Safari) ───────────────────────────────── */
+
+/* Width — 5px matches Gemini sidebar scrollbar */
+.omnimind-scrollbar::-webkit-scrollbar,
 .omnimind-scroller::-webkit-scrollbar {
-  width: 5px !important; /* Ekdum slim patli line */
+  width: 5px;
+  height: 5px; /* for horizontal scrollbars too */
 }
 
+/* Track — completely transparent, blends into any background */
+.omnimind-scrollbar::-webkit-scrollbar-track,
 .omnimind-scroller::-webkit-scrollbar-track {
-  background: transparent !important; /* Ganda white/grey background lock khatam */
+  background: transparent;
 }
 
+/* Thumb — invisible by default */
+.omnimind-scrollbar::-webkit-scrollbar-thumb,
 .omnimind-scroller::-webkit-scrollbar-thumb {
-  background: transparent !important; /* Default me hidden */
-  border-radius: 9999px !important;
+  background: transparent;
+  border-radius: 9999px;
+  transition: background 0.3s ease;
 }
 
-/* Hover active state logic */
+/* Thumb — appears when the container is hovered */
+.omnimind-scrollbar:hover::-webkit-scrollbar-thumb,
 .omnimind-scroller:hover::-webkit-scrollbar-thumb {
-  background: rgba(148, 153, 179, 0.25) !important; /* Soft translucent indicator */
+  background: rgba(148, 153, 179, 0.20);
 }
 
-.omnimind-scroller::-webkit-scrollbar-thumb:hover {
-  background: rgba(148, 153, 179, 0.45) !important; /* Scroll pakadne pe thoda bright */
+/* Thumb — brighter when actively dragging */
+.omnimind-scrollbar::-webkit-scrollbar-thumb:hover,
+.omnimind-scroller::-webkit-scrollbar-thumb:hover,
+.omnimind-scrollbar::-webkit-scrollbar-thumb:active,
+.omnimind-scroller::-webkit-scrollbar-thumb:active {
+  background: rgba(148, 153, 179, 0.45);
 }
+
+/* Corner piece where horizontal + vertical scrollbars meet */
+.omnimind-scrollbar::-webkit-scrollbar-corner,
+.omnimind-scroller::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   Animations
+═══════════════════════════════════════════════════════════════════ */
 
 @keyframes fadeIn {
   from { opacity: 0; }
-  to { opacity: 1; }
+  to   { opacity: 1; }
 }
+
 @keyframes scaleIn {
   from { transform: scale(0.95); opacity: 0; }
-  to { transform: scale(1); opacity: 1; }
-}
-.animate-fade-in {
-  animation: fadeIn 0.2s ease-out forwards;
-}
-.animate-scale-in {
-  animation: scaleIn 0.2s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  to   { transform: scale(1);    opacity: 1; }
 }
 
-
-
-/* 🟢 FIX: Custom animations ko @utility wrapper ke andar define karo */
 @utility animate-fade-in {
   animation: fadeIn 0.2s ease-out forwards;
 }
 
 @utility animate-scale-in {
   animation: scaleIn 0.2s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
-}
-
-/* Base structural keyframes mapping unchanged */
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-
-@keyframes scaleIn {
-  from { transform: scale(0.95); opacity: 0; }
-  to { transform: scale(1); opacity: 1; }
 }

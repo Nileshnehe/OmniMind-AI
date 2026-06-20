@@ -2,7 +2,10 @@ import API from "../../../services/api";
 
 
 export const sendMessage = async ({ message, chatId }) => {
-    const response = await API.post("/chats/message", { message, chatId });
+    const response = await API.post("/chats/message", {
+        message: message,
+        chat: chatId
+    });
     return response.data;
 }
 
