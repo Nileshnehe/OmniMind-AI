@@ -4,32 +4,38 @@ import { useAuth } from '../../../hooks/useAuth';
 const AuthWrapper = ({ children }) => {
     const { checkSession, isCheckingSession } = useAuth();
 
-    
+
     useEffect(() => {
         checkSession();
     }, [checkSession]);
 
-   
-    if (isCheckingSession) {
-        return (
-            <div className="min-h-screen w-full flex flex-col items-center justify-center bg-bg-page dark:bg-[#0D0E15]">
-                <div className="flex flex-col items-center gap-4 animate-pulse">
-                    <svg className="animate-spin h-10 w-10 text-brand dark:text-[#7B6AFF]" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                    </svg>
-                    <h2 className="text-text-primary text-xl font-bold tracking-wide">
-                        OmniMind Workspace
-                    </h2>
-                    <p className="text-text-muted text-sm font-medium">
-                        Waking up your AI agents...
-                    </p>
-                </div>
-            </div>
-        );
-    }
 
     
+if (isCheckingSession) {
+  return (
+    <div className="flex h-screen w-full bg-bg-page dark:bg-[#0D0E15]">
+       
+       <div className="w-64 h-full border-r border-border/40 p-4 hidden md:flex flex-col gap-4 animate-pulse">
+          <div className="h-10 w-full bg-surface-hover/60 rounded-xl"></div>
+          <div className="h-6 w-3/4 bg-surface-hover/60 rounded-md mt-6"></div>
+          <div className="h-6 w-1/2 bg-surface-hover/60 rounded-md mt-2"></div>
+       </div>
+
+       
+       <div className="flex-1 h-full flex flex-col p-6 animate-pulse">
+          <div className="flex-1 flex flex-col justify-center items-center gap-4">
+             
+             <div className="h-10 w-64 bg-surface-hover/60 rounded-lg"></div>
+             <div className="h-6 w-48 bg-surface-hover/40 rounded-md"></div>
+          </div>
+          
+          <div className="h-14 w-full max-w-3xl mx-auto bg-surface-hover/60 rounded-2xl mb-4"></div>
+       </div>
+    </div>
+  );
+}
+
+
     return children;
 };
 

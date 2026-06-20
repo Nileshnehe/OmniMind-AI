@@ -8,7 +8,7 @@ export const initializeSocketConnection = () => {
 
     if (!socket) {
         socket = io("http://localhost:3000", {
-            withCredentialse: true,
+            withCredentials: true,
         });
 
         socket.on("connect", () => {

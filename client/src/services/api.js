@@ -18,7 +18,7 @@ API.interceptors.request.use(
   (config) => {
     const savedToken = localStorage.getItem('omnimind_token');
     if (savedToken) {
-      config.headers.Authorization = `Bearer ${savedToken}`; // Perfect authentication token string pass
+      config.headers.Authorization = `Bearer ${savedToken}`;
     }
     return config;
   },

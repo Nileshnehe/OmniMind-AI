@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import { authServices } from '../../features/auth/services/auth.service';
+import { authServices } from '../../features/auth/services/auth.api';
 
 // Async Thunk for Register Pipeline
 export const registerUserThunk = createAsyncThunk(
