@@ -69,50 +69,56 @@ const Dashboard = () => {
       />
 
       <div className='flex-1 h-full w-full flex flex-col relative bg-bg-page dark:bg-[#0D0E15] transition-all duration-300'>
-        <div className='flex-1 w-full p-6 mx-auto flex flex-col gap-4 overflow-y-auto omnimind-scrollbar'>
+        
+        {/* Outermost container with scrollbar on the far right */}
+        <div className='flex-1 w-full overflow-y-auto omnimind-scrollbar pt-6'>
+          
+          {/* Centered inner content container (matches ChatInput max-w-3xl) */}
+          <div className='w-full max-w-3xl mx-auto px-4 flex flex-col gap-4 min-h-full pb-4'>
 
-          {/* ── Welcome Screen ───────────────────────────────────────── */}
-          {messages.length === 0 && !isAgentTyping ? (
-            <div className='m-auto text-center select-none'>
-              <h1 className='text-3xl font-bold'>Where knowledge begins</h1>
-              <p className='text-text-muted text-[15px] mt-1'>Ask OmniMind anything...</p>
-            </div>
-          ) : (
-            <>
-              {/* ── Message Bubbles ────────────────────────────────── */}
-              {messages.map((message, index) => (
-                <div
-                  key={index}
-                  className={`flex flex-col max-w-[80%] p-3.5 rounded-xl text-[15px] leading-relaxed
-                    ${message.role === 'user'
-                      ? 'bg-surface-hover ml-auto text-text-primary rounded-br-none'
-                      : 'bg-bg-card dark:bg-[#161722] border border-border dark:border-[#2D3042] mr-auto text-text-primary rounded-bl-none'
-                    }`}
-                >
-                  <p className='font-bold text-[11px] uppercase tracking-wider mb-1 text-text-muted'>
-                    {message.role === 'user' ? 'You' : 'OmniMind AI'}
-                  </p>
-
-                  {message.role === 'user' ? (
-                    <p className='whitespace-pre-wrap break-words leading-relaxed'>
-                      {message.content}
+            {/* ── Welcome Screen ───────────────────────────────────────── */}
+            {messages.length === 0 && !isAgentTyping ? (
+              <div className='m-auto text-center select-none'>
+                <h1 className='text-3xl font-bold'>Where knowledge begins</h1>
+                <p className='text-text-muted text-[15px] mt-1'>Ask OmniMind anything...</p>
+              </div>
+            ) : (
+              <>
+                {/* ── Message Bubbles ────────────────────────────────── */}
+                {messages.map((message, index) => (
+                  <div
+                    key={index}
+                    className={`flex flex-col max-w-[80%] p-3.5 rounded-xl text-[15px] leading-relaxed
+                      ${message.role === 'user'
+                        ? 'bg-surface-hover ml-auto text-text-primary rounded-br-none'
+                        : 'bg-bg-card dark:bg-[#161722] border border-border dark:border-[#2D3042] mr-auto text-text-primary rounded-bl-none'
+                      }`}
+                  >
+                    <p className='font-bold text-[11px] uppercase tracking-wider mb-1 text-text-muted'>
+                      {message.role === 'user' ? 'You' : 'OmniMind AI'}
                     </p>
-                  ) : (
-                    <TypewriterMessage
-                      text={message.content}
-                      speed={15}
-                      // animate only for freshly generated responses, never for history
-                      animate={message.isNew && message.role !== 'user'}
-                    />
-                  )}
-                </div>
-              ))}
 
-              {/* ── TypingIndicator: 3 bouncing dots while AI thinks ── */}
-              {isAgentTyping && <TypingIndicator />}
-            </>
-          )}
+                    {message.role === 'user' ? (
+                      <p className='whitespace-pre-wrap break-words leading-relaxed'>
+                        {message.content}
+                      </p>
+                    ) : (
+                      <TypewriterMessage
+                        text={message.content}
+                        speed={15}
+                        // animate only for freshly generated responses, never for history
+                        animate={message.isNew && message.role !== 'user'}
+                      />
+                    )}
+                  </div>
+                ))}
 
+                {/* ── TypingIndicator: 3 bouncing dots while AI thinks ── */}
+                {isAgentTyping && <TypingIndicator />}
+              </>
+            )}
+            
+          </div>
         </div>
 
         <ChatInput onSendMessage={handleSend} />
