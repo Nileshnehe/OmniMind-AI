@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router';
-import React, { useState } from 'react'; 
+import React, { useState } from 'react';
 import RecentActivity from './RecentActivity';
 import RecentChat from './RecentChat';
 import UserProfileBlock from './UserProfileBlock';
@@ -11,15 +11,17 @@ import toggleIcon from '../../../../assets/sideNavigation.svg';
 import newChatIcon from '../../../../assets/rename.svg';
 import downArrowIcon from '../../../../assets/arrowdown.svg';
 import searchIcon from '../../../../assets/search.svg';
-import moreVertIcon from '../../../../assets/morevert.svg';
 
 
 const Sidebar = ({ isOpen, onToggle, onChatSelect }) => { 
-  const { logout, user } = useAuth(); 
-  const { chats } = useChat();
+  const { logout, user } = useAuth();
+  const { chats, handleDeleteChat } = useChat();
   const navigate = useNavigate();
-  
+
   const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
+  // Single source of truth: which chat's options menu is currently open.
+  // Setting a new id auto-closes the previously open one.
+  const [activeDropdownId, setActiveDropdownId] = useState(null);
 
   // Actual confirm logout handler
   const handleConfirmLogout = async () => {
@@ -75,16 +77,25 @@ const Sidebar = ({ isOpen, onToggle, onChatSelect }) => {
         </div>
       </div>
 
-      {/* MIDDLE CONTAINER: SCROLLER */}
       <div className={`flex-1 overflow-y-auto pr-1 mt-2 omnimind-scroller w-full ${isOpen ? 'block' : 'hidden'}`}>
         <RecentActivity title='Recent' icon={downArrowIcon} isOpen={isOpen}>
-          {/* Render actual chats from Redux */}
           {Object.values(chats).map((chat) => (
             <RecentChat
               key={chat.id}
+              chatId={chat.id}
               title={chat.title}
-              icon={moreVertIcon}
-              onClick={() => onChatSelect && onChatSelect(chat.id)}
+              onClick={() => {
+                setActiveDropdownId(null); // Close any open menu on chat open
+                onChatSelect?.(chat.id);
+              }}
+              isMenuOpen={activeDropdownId === chat.id}
+              onMenuToggle={() =>
+                // Toggle: if already open close it; if closed open it (closing any other)
+                setActiveDropdownId(prev => prev === chat.id ? null : chat.id)
+              }
+              onMenuClose={() => setActiveDropdownId(null)}
+              onDelete={(id) => handleDeleteChat(id)}
+              onRename={(id) => console.log('Rename', id)} // wire up rename when ready
             />
           ))}
         </RecentActivity>
