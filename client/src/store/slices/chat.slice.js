@@ -30,13 +30,15 @@ const chatSlice = createSlice({
         addNewMessage: (state, action) => {
             const { chatId, content, role } = action.payload;
             if (state.chats[chatId]) {
-                state.chats[chatId].messages.push({ content, role });
+                // isNew: true → typewriter animation will play for this message
+                state.chats[chatId].messages.push({ content, role, isNew: true });
             }
         },
         addMessages: (state, action) => {
             const { chatId, messages } = action.payload;
             if (state.chats[chatId]) {
-                state.chats[chatId].messages = messages;
+                // isNew: false → history messages skip animation, show instantly
+                state.chats[chatId].messages = messages.map(msg => ({ ...msg, isNew: false }));
             }
         },
         removeChat: (state, action) => {

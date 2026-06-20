@@ -5,6 +5,7 @@ import RecentChat from './RecentChat';
 import UserProfileBlock from './UserProfileBlock';
 import LogoutModal from './LogoutModal'; 
 import { useAuth } from '../../../../hooks/useAuth';
+import { useChat } from '../../hooks/useChat';
 
 import toggleIcon from '../../../../assets/sideNavigation.svg';
 import newChatIcon from '../../../../assets/rename.svg';
@@ -13,9 +14,10 @@ import searchIcon from '../../../../assets/search.svg';
 import moreVertIcon from '../../../../assets/morevert.svg';
 
 
-const Sidebar = ({ isOpen, onToggle }) => { 
+const Sidebar = ({ isOpen, onToggle, onChatSelect }) => { 
   const { logout, user } = useAuth(); 
-    const navigate = useNavigate();
+  const { chats } = useChat();
+  const navigate = useNavigate();
   
   const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
 
@@ -54,9 +56,11 @@ const Sidebar = ({ isOpen, onToggle }) => {
         {/* Navigation Menu */}
         <div className='flex flex-col gap-1.5 px-1 w-full items-center'>
           {/* Button 1: New Chat */}
-          <button className={`flex items-center h-11 text-text-primary rounded-lg cursor-pointer transition-all duration-200 text-[14px] font-medium group w-full flex-shrink-0
-            ${isOpen ? 'px-3 gap-3.5 justify-start bg-surface-hover/50 hover:bg-surface-hover' : 'p-0 justify-center hover:bg-surface-hover/80'}
-          `}>
+          <button
+            onClick={() => navigate('/dashboard')}
+            className={`flex items-center h-11 text-text-primary rounded-lg cursor-pointer transition-all duration-200 text-[14px] font-medium group w-full flex-shrink-0
+              ${isOpen ? 'px-3 gap-3.5 justify-start bg-surface-hover/50 hover:bg-surface-hover' : 'p-0 justify-center hover:bg-surface-hover/80'}
+            `}>
             <img src={newChatIcon} alt="new-chat" className='w-5 h-5 min-w-[20px] min-h-[20px] dark:invert opacity-70 group-hover:opacity-100 transition-opacity object-contain flex-shrink-0' />
             {isOpen && <span className='truncate animate-fade-in'>New Chat</span>}
           </button>
@@ -74,8 +78,15 @@ const Sidebar = ({ isOpen, onToggle }) => {
       {/* MIDDLE CONTAINER: SCROLLER */}
       <div className={`flex-1 overflow-y-auto pr-1 mt-2 omnimind-scroller w-full ${isOpen ? 'block' : 'hidden'}`}>
         <RecentActivity title='Recent' icon={downArrowIcon} isOpen={isOpen}>
-          <RecentChat title="Logo Design for OmniMind AI" icon={moreVertIcon} />
-          <RecentChat title="AI Tool Name Ideas" icon={moreVertIcon} />
+          {/* Render actual chats from Redux */}
+          {Object.values(chats).map((chat) => (
+            <RecentChat
+              key={chat.id}
+              title={chat.title}
+              icon={moreVertIcon}
+              onClick={() => onChatSelect && onChatSelect(chat.id)}
+            />
+          ))}
         </RecentActivity>
       </div>
 

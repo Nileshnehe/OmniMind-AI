@@ -51,27 +51,26 @@ export const useChat = () => {
 
     // 3. Open Specific Chat (Hydrate Messages)
     const handleOpenChat = useCallback(async (chatId) => {
+        if (!chatId) return;
         try {
             dispatch(setCurrentChatId(chatId));
 
-            // API sirf tabhi hit karo jab messages pehle se load na ho (Optimization)
-            if (!chats[chatId] || chats[chatId].messages.length === 0) {
-                dispatch(setLoading(true));
-                const data = await getMessage(chatId);
+            // Always fetch messages — URL-based hydration needs fresh data on reload
+            dispatch(setLoading(true));
+            const data = await getMessage(chatId);
 
-                const formattedMessages = data.messages.map(msg => ({
-                    content: msg.content,
-                    role: msg.role,
-                }));
+            const formattedMessages = data.messages.map(msg => ({
+                content: msg.content,
+                role: msg.role,
+            }));
 
-                dispatch(addMessages({ chatId, messages: formattedMessages }));
-            }
+            dispatch(addMessages({ chatId, messages: formattedMessages }));
         } catch (error) {
             dispatch(setError(error.message));
         } finally {
             dispatch(setLoading(false));
         }
-    }, [chats, dispatch]);
+    }, [dispatch]); // ✅ Stable — no chats dependency
 
     // 4. Send Message (Hybrid: API for DB, Socket for UI)
     const handleSendMessage = useCallback(async (messageText) => {
@@ -117,6 +116,9 @@ export const useChat = () => {
                 content: aiResponse.content,
                 role: aiResponse.role || "ai",
             }));
+
+            // Return finalChatId so Dashboard can sync the URL
+            return finalChatId;
 
         } catch (error) {
             dispatch(setError(error.message));

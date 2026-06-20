@@ -9,7 +9,6 @@ import PublicRoute from './PublicRoute'
 export const routes = createBrowserRouter([
 
     {
-
         path: '/login',
         element:
             <PublicRoute>
@@ -27,9 +26,18 @@ export const routes = createBrowserRouter([
         path: '/price',
         element: <PricingPlans />
     },
+    // Base dashboard (no active chat)
     {
-
         path: '/dashboard',
+        element: (
+            <ProtectedRoute>
+                <Dashboard />
+            </ProtectedRoute>
+        ),
+    },
+    // Dynamic chat route — chatId from URL hydrates the chat on reload
+    {
+        path: '/chat/:chatId',
         element: (
             <ProtectedRoute>
                 <Dashboard />
