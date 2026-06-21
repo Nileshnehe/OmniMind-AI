@@ -69,10 +69,10 @@ const Dashboard = () => {
       />
 
       <div className='flex-1 h-full w-full flex flex-col relative bg-bg-page dark:bg-[#0D0E15] transition-all duration-300'>
-        
+
         {/* Outermost container with scrollbar on the far right */}
         <div className='flex-1 w-full overflow-y-auto omnimind-scrollbar pt-6'>
-          
+
           {/* Centered inner content container (matches ChatInput max-w-3xl) */}
           <div className='w-full max-w-3xl mx-auto px-4 flex flex-col gap-4 min-h-full pb-4'>
 
@@ -117,7 +117,7 @@ const Dashboard = () => {
                 {isAgentTyping && <TypingIndicator />}
               </>
             )}
-            
+
           </div>
         </div>
 

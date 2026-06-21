@@ -1,15 +1,20 @@
 import React, { useRef } from 'react';
+import { formatChatDate } from '../../../../utils/dateUtils.js';
 import ChatOptionsMenu from './ChatOptionsMenu';
+
 
 const RecentChat = ({
   chatId,
   title,
+  createdAt,
   onClick,
   isMenuOpen,
   onMenuToggle,
   onMenuClose,
   onDelete,
   onRename,
+  showDate = false
+
 }) => {
   // Ref on the ⋮ button — passed to ChatOptionsMenu as anchorEl
   // so the portal can calculate its fixed position from the button's rect
@@ -25,6 +30,13 @@ const RecentChat = ({
         <span className='text-[14px] font-medium tracking-wide truncate opacity-85 group-hover:opacity-100 transition-opacity flex-1 min-w-0 pr-2'>
           {title}
         </span>
+
+        {/* Right-aligned Date */}
+        {showDate && (
+          <span className="text-[12px] text-text-muted mr-2 whitespace-nowrap opacity-60 group-hover:opacity-100 transition-opacity">
+            {formatChatDate(createdAt)}
+          </span>
+        )}
 
         {/* Three-dots button — ref captured for portal positioning */}
         <button
@@ -42,9 +54,9 @@ const RecentChat = ({
         >
           {/* Vertical dots ⋮ */}
           <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" className='opacity-60'>
-            <circle cx="12" cy="5"  r="2"/>
-            <circle cx="12" cy="12" r="2"/>
-            <circle cx="12" cy="19" r="2"/>
+            <circle cx="12" cy="5" r="2" />
+            <circle cx="12" cy="12" r="2" />
+            <circle cx="12" cy="19" r="2" />
           </svg>
         </button>
       </div>
