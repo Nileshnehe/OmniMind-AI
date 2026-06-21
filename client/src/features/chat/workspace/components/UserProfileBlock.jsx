@@ -1,11 +1,38 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import userIcon from '../../../../assets/profile.svg'
 import moreVertIcon from '../../../../assets/morevert.svg'
 import UserDropdownMenu from './UserDropdownMenu'
+import { Sun, Moon } from 'lucide-react'
 
 
 const UserProfileBlock = ({ isOpen, user, onLogoutTrigger }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isDarkMode, setIsDarkMode] = useState(false);
+
+  useEffect(() => {
+    const storedTheme = localStorage.getItem('theme');
+    if (storedTheme === 'dark' || (!storedTheme && document.documentElement.classList.contains('dark'))) {
+      setIsDarkMode(true);
+      document.documentElement.classList.add('dark');
+    } else {
+      setIsDarkMode(false);
+      document.documentElement.classList.remove('dark');
+    }
+  }, []);
+
+  const toggleTheme = (e) => {
+    e.stopPropagation();
+    const newMode = !isDarkMode;
+    setIsDarkMode(newMode);
+    
+    if (newMode) {
+      document.documentElement.classList.add('dark');
+      localStorage.setItem('theme', 'dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+      localStorage.setItem('theme', 'light');
+    }
+  };
 
   return (
     <div className='relative w-full'>
@@ -41,16 +68,35 @@ const UserProfileBlock = ({ isOpen, user, onLogoutTrigger }) => {
         </div>
 
         {isOpen && (
-          <div 
-            onClick={(e) => {
-              e.stopPropagation();
-              setIsMenuOpen(!isMenuOpen);
-            }}
-            className={`p-1 rounded-md transition-colors flex items-center justify-center flex-shrink-0
-              ${isMenuOpen ? 'bg-border/60 opacity-100' : 'hover:bg-border/40 opacity-70 group-hover:opacity-100'}
-            `}
-          >
-            <img src={moreVertIcon} alt="more" className='w-4 h-4 dark:invert object-contain' />
+          <div className="flex items-center gap-1">
+            <div
+              onClick={toggleTheme}
+              className="group/theme relative w-8 h-8 rounded-md hover:bg-border/40 transition-colors flex items-center justify-center cursor-pointer flex-shrink-0 text-text-primary"
+            >
+              <div className="transition-all duration-300">
+                {isDarkMode ? (
+                  <Sun className="w-4 h-4" />
+                ) : (
+                  <Moon className="w-4 h-4" />
+                )}
+              </div>
+              
+              <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 text-xs font-medium text-text-primary bg-bg-card border border-border rounded-md opacity-0 group-hover/theme:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-50">
+                {isDarkMode ? 'Switch to light mode' : 'Switch to dark mode'}
+              </span>
+            </div>
+
+            <div 
+              onClick={(e) => {
+                e.stopPropagation();
+                setIsMenuOpen(!isMenuOpen);
+              }}
+              className={`w-8 h-8 rounded-md transition-colors flex items-center justify-center flex-shrink-0
+                ${isMenuOpen ? 'bg-border/60 opacity-100' : 'hover:bg-border/40 opacity-70 group-hover:opacity-100'}
+              `}
+            >
+              <img src={moreVertIcon} alt="more" className='w-4 h-4 dark:invert object-contain' />
+            </div>
           </div>
         )}
 
