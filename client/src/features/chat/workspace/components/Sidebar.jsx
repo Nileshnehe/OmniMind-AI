@@ -6,9 +6,11 @@ import UserProfileBlock from './UserProfileBlock';
 import LogoutModal from './LogoutModal'; 
 import { useAuth } from '../../../../hooks/useAuth';
 import { useChat } from '../../hooks/useChat';
+import { useDispatch } from 'react-redux';
+import { setCurrentChatId } from '../../../../store/slices/chat.slice';
+import { Plus } from 'lucide-react';
 
 import toggleIcon from '../../../../assets/sideNavigation.svg';
-import newChatIcon from '../../../../assets/rename.svg';
 import downArrowIcon from '../../../../assets/arrowdown.svg';
 import searchIcon from '../../../../assets/search.svg';
 
@@ -17,6 +19,7 @@ const Sidebar = ({ isOpen, onToggle, onChatSelect }) => {
   const { logout, user } = useAuth();
   const { chats, handleDeleteChat } = useChat();
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
   // Single source of truth: which chat's options menu is currently open.
@@ -59,11 +62,14 @@ const Sidebar = ({ isOpen, onToggle, onChatSelect }) => {
         <div className='flex flex-col gap-1.5 px-1 w-full items-center'>
           {/* Button 1: New Chat */}
           <button
-            onClick={() => navigate('/dashboard')}
+            onClick={() => {
+              dispatch(setCurrentChatId(null));
+              navigate('/dashboard');
+            }}
             className={`flex items-center h-11 text-text-primary rounded-lg cursor-pointer transition-all duration-200 text-[14px] font-medium group w-full flex-shrink-0
               ${isOpen ? 'px-3 gap-3.5 justify-start bg-surface-hover/50 hover:bg-surface-hover' : 'p-0 justify-center hover:bg-surface-hover/80'}
             `}>
-            <img src={newChatIcon} alt="new-chat" className='w-5 h-5 min-w-[20px] min-h-[20px] dark:invert opacity-70 group-hover:opacity-100 transition-opacity object-contain flex-shrink-0' />
+            <Plus className='w-5 h-5 min-w-[20px] min-h-[20px] opacity-70 group-hover:opacity-100 transition-opacity flex-shrink-0' />
             {isOpen && <span className='truncate animate-fade-in'>New Chat</span>}
           </button>
 
