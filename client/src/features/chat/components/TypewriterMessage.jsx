@@ -1,56 +1,21 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React from 'react';
 import MarkdownRenderer from './MarkdownRenderer';
+import { useFastTypewriter } from '../hooks/useFastTypewriter';
 
 /**
  * TypewriterMessage
  *
- * Streams text character by character, then switches to full MarkdownRenderer
+ * Streams text in chunks, then switches to full MarkdownRenderer
  * once typing is complete so formatting renders perfectly.
  *
- * WHY this pattern?
- *   Parsing markdown on a partial string causes flickering (e.g. an unclosed
- *   **bold** splits into raw asterisks mid-animation). The best practice is:
- *     Phase 1 – Stream raw text (plain, no markdown parsing)
- *     Phase 2 – Swap to MarkdownRenderer once the full string is ready
- *
  * Props:
- *   text    – the full AI response string
- *   speed   – ms per character (default 15)
- *   animate – false = skip animation, go straight to MarkdownRenderer
+ *   text     – the full AI response string
+ *   speed    – ms per tick (default 10)
+ *   animate  – false = skip animation, go straight to MarkdownRenderer
+ *   onTyping – callback triggered on every text update for auto-scrolling
  */
-const TypewriterMessage = ({ text = '', speed = 15, animate = true }) => {
-  const [displayedText, setDisplayedText] = useState('');
-  const [isDone, setIsDone] = useState(false);
-  const indexRef = useRef(0);
-
-  useEffect(() => {
-    // No animation → jump straight to markdown render
-    if (!animate) {
-      setDisplayedText(text);
-      setIsDone(true);
-      return;
-    }
-
-    // Reset for new message
-    setDisplayedText('');
-    setIsDone(false);
-    indexRef.current = 0;
-
-    if (!text) return;
-
-    const interval = setInterval(() => {
-      const i = indexRef.current;
-      if (i < text.length) {
-        setDisplayedText(text.slice(0, i + 1));
-        indexRef.current += 1;
-      } else {
-        setIsDone(true);
-        clearInterval(interval);
-      }
-    }, speed);
-
-    return () => clearInterval(interval);
-  }, [text, animate, speed]);
+const TypewriterMessage = ({ text = '', speed = 10, animate = true, onTyping }) => {
+  const { displayedText, isDone } = useFastTypewriter(text, speed, animate, onTyping);
 
   // ── Phase 2: typing done → full markdown ──────────────────────
   if (isDone) {
@@ -63,15 +28,8 @@ const TypewriterMessage = ({ text = '', speed = 15, animate = true }) => {
       {displayedText}
       {/* Blinking cursor while streaming */}
       <span
-        className='inline-block w-[2px] h-[1em] bg-current ml-[2px] align-middle rounded-sm'
-        style={{ animation: 'cursorBlink 0.7s step-end infinite' }}
+        className='inline-block w-[2px] h-[1em] bg-current ml-[2px] align-middle rounded-sm animate-pulse'
       />
-      <style>{`
-        @keyframes cursorBlink {
-          0%, 100% { opacity: 1; }
-          50%       { opacity: 0; }
-        }
-      `}</style>
     </span>
   );
 };

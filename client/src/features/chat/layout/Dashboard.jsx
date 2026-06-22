@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router';
 import Sidebar from '../workspace/components/Sidebar';
 import ChatInput from '../components/ChatInput';
@@ -18,6 +18,7 @@ const Dashboard = () => {
 
   const {
     messages,
+    isLoading,
     isAgentTyping,
     handleSendMessage,
     handleGetChats,
@@ -57,6 +58,17 @@ const Dashboard = () => {
     }
   }, [handleSendMessage, navigate, urlChatId]);
 
+  // ── Auto-scroll setup ────────────────────────────────────────────
+  const messagesEndRef = useRef(null);
+
+  const scrollToBottom = useCallback(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' });
+  }, []);
+
+  // Trigger auto-scroll on new messages or when agent typing status changes
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages, isAgentTyping, scrollToBottom]);
 
   return (
     <div className='h-screen w-full flex bg-bg-page dark:bg-[#0D0E15] overflow-hidden relative transition-colors duration-200'>
@@ -88,10 +100,10 @@ const Dashboard = () => {
                 {messages.map((message, index) => (
                   <div
                     key={index}
-                    className={`flex flex-col max-w-[80%] p-3.5 rounded-xl text-[15px] leading-relaxed
+                    className={`flex flex-col p-3.5 rounded-xl text-[15px] leading-relaxed
                       ${message.role === 'user'
-                        ? 'bg-surface-hover ml-auto text-text-primary rounded-br-none'
-                        : 'bg-bg-card dark:bg-[#161722] border border-border dark:border-[#2D3042] mr-auto text-text-primary rounded-bl-none'
+                        ? 'bg-surface-hover ml-auto text-text-primary rounded-br-none max-w-[80%] w-fit'
+                        : 'bg-bg-card dark:bg-[#161722] border border-border dark:border-[#2D3042] mr-auto text-text-primary rounded-bl-none w-full'
                       }`}
                   >
                     <p className='font-bold text-[11px] uppercase tracking-wider mb-1 text-text-muted'>
@@ -105,16 +117,20 @@ const Dashboard = () => {
                     ) : (
                       <TypewriterMessage
                         text={message.content}
-                        speed={15}
+                        speed={10}
                         // animate only for freshly generated responses, never for history
                         animate={message.isNew && message.role !== 'user'}
+                        onTyping={scrollToBottom}
                       />
                     )}
                   </div>
                 ))}
 
                 {/* ── TypingIndicator: 3 bouncing dots while AI thinks ── */}
-                {isAgentTyping && <TypingIndicator />}
+                {(isAgentTyping || isLoading) && <TypingIndicator />}
+
+                {/* Dummy div to scroll into view */}
+                <div ref={messagesEndRef} />
               </>
             )}
 

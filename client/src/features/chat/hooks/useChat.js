@@ -90,7 +90,16 @@ export const useChat = () => {
             }
 
             // Backend Call
+            const startTime = Date.now();
             const data = await sendMessage({ message: messageText, chatId: currentChatId });
+            
+            // Add artificial delay so bouncing dots run for a few seconds first
+            const elapsedTime = Date.now() - startTime;
+            const minDelay = 1500; // 1.5 seconds
+            if (elapsedTime < minDelay) {
+                await new Promise(resolve => setTimeout(resolve, minDelay - elapsedTime));
+            }
+
             const { chat, aiResponse, title } = data; // backend response match kiya hai
 
             const finalChatId = chat ? chat._id : currentChatId;
