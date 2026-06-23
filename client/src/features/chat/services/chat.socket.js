@@ -7,7 +7,7 @@ export const initializeSocketConnection = () => {
 
 
     if (!socket) {
-        socket = io("http://localhost:3000", {
+        socket = io(import.meta.env.BACKEND_URL, {
             withCredentials: true,
         });
 
