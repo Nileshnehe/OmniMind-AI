@@ -20,8 +20,19 @@ const mistralModel = new ChatMistralAI({
 
 
 export async function generateResponse(messages) {
-    
-    
+
+
+    const currentDate = new Date().toLocaleString('en-IN', {
+        weekday: 'long',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        timeZone: 'Asia/Kolkata'
+    });
+
     const chatHistory = messages.map(msg => {
         if (msg.role === "user") {
             return new HumanMessage(msg.content);
@@ -30,9 +41,12 @@ export async function generateResponse(messages) {
         }
     });
 
-  const response = await geminiModel.invoke([
-    new SystemMessage(`
+    const response = await geminiModel.invoke([
+        new SystemMessage(`
 You are a helpful AI assistant.
+
+IMPORTANT CONTEXT:
+The current real-time date and time is: ${currentDate}. Always use this exact date and time if the user asks about today, the current time, or the current date.
 
 Guidelines:
 - Give accurate and clear answers.
@@ -43,10 +57,10 @@ Guidelines:
 - Be concise for simple questions and detailed for complex ones.
 - If writing code, provide clean and production-quality code with explanations.
     `),
-    ...chatHistory 
-  ]);
+        ...chatHistory
+    ]);
 
-  return response.content.trim();
+    return response.content.trim();
 }
 
 export async function generateChatTitle(message) {
