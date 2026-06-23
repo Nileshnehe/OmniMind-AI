@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import userIcon from '../../../../assets/profile.svg'
 import moreVertIcon from '../../../../assets/morevert.svg'
 import UserDropdownMenu from './UserDropdownMenu'
@@ -8,6 +8,20 @@ import { Sun, Moon } from 'lucide-react'
 const UserProfileBlock = ({ isOpen, user, onLogoutTrigger }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(false);
+  const menuRef = useRef(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (isMenuOpen && menuRef.current && !menuRef.current.contains(event.target)) {
+        setIsMenuOpen(false);
+      }
+    };
+    
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isMenuOpen]);
 
   useEffect(() => {
     const storedTheme = localStorage.getItem('theme');
@@ -35,7 +49,7 @@ const UserProfileBlock = ({ isOpen, user, onLogoutTrigger }) => {
   };
 
   return (
-    <div className='relative w-full'>
+    <div className='relative w-full' ref={menuRef}>
       
       {/* 1. THE DROPDOWN MENU */}
       {isMenuOpen && isOpen && (
@@ -56,7 +70,9 @@ const UserProfileBlock = ({ isOpen, user, onLogoutTrigger }) => {
       `}>
         
         <div className='flex items-center gap-3 min-w-0 flex-1'>
-          <img src={userIcon} alt="user" className='w-9 h-9 rounded-full object-contain dark:invert flex-shrink-0' />
+          <div className="w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold bg-blue-600 text-white flex-shrink-0 shadow-sm">
+            {user?.username && user.username !== 'Loading...' ? user.username.charAt(0).toUpperCase() : '?'}
+          </div>
           {isOpen && (
             <div className='flex flex-col min-w-0 leading-tight text-left pr-1'>
               <p className='font-semibold text-[14px] tracking-wide truncate w-full capitalize text-text-primary'>
