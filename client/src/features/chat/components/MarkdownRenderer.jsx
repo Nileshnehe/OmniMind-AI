@@ -28,8 +28,33 @@ const MarkdownRenderer = ({ content = '' }) => {
           const language = match ? match[1] : '';
           const codeString = String(children).replace(/\n$/, '');
 
+          // React-Markdown v9+ removed the `inline` prop (it will be undefined).
+          // We check `inline` if it exists, otherwise fallback to heuristics:
+          // 1. If there's a language tag, it's a block.
+          // 2. If it spans multiple lines, it's a block.
+          // 3. If it contains a newline, it's a block.
+          const isInlineCode = typeof inline !== 'undefined' 
+            ? inline 
+            : match 
+              ? false 
+              : node?.position 
+                ? node.position.start.line === node.position.end.line 
+                : !String(children).includes('\n');
+
+          // Inline Code Styling
+          if (isInlineCode) {
+            return (
+              <code
+                className='bg-surface-hover text-primary-text px-1 py-0.5 rounded text-sm font-mono'
+                {...props}
+              >
+                {children}
+              </code>
+            );
+          }
+
           // Fenced code block with language tag  ```js … ```
-          if (!inline && language) {
+          if (language) {
             return (
               <div className='my-3 rounded-lg overflow-hidden border border-white/10'>
                 {/* Language badge */}
@@ -58,36 +83,24 @@ const MarkdownRenderer = ({ content = '' }) => {
           }
 
           // Fenced block without language tag  ``` … ```
-          if (!inline) {
-            return (
-              <div className='my-3 rounded-lg overflow-hidden border border-white/10'>
-                <SyntaxHighlighter
-                  style={oneDark}
-                  language='text'
-                  PreTag='div'
-                  customStyle={{
-                    margin: 0,
-                    padding: '1rem',
-                    fontSize: '13px',
-                    lineHeight: '1.6',
-                    background: '#13131a',
-                  }}
-                  {...props}
-                >
-                  {codeString}
-                </SyntaxHighlighter>
-              </div>
-            );
-          }
-
-          // Inline code  `let x = 1`
           return (
-            <code
-              className='bg-white/10 dark:bg-white/10 text-blue-300 rounded px-1.5 py-0.5 text-[13px] font-mono'
-              {...props}
-            >
-              {children}
-            </code>
+            <div className='my-3 rounded-lg overflow-hidden border border-white/10'>
+              <SyntaxHighlighter
+                style={oneDark}
+                language='text'
+                PreTag='div'
+                customStyle={{
+                  margin: 0,
+                  padding: '1rem',
+                  fontSize: '13px',
+                  lineHeight: '1.6',
+                  background: '#13131a',
+                }}
+                {...props}
+              >
+                {codeString}
+              </SyntaxHighlighter>
+            </div>
           );
         },
 
