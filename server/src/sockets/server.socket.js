@@ -5,7 +5,7 @@ let io;
 export function initSocket(httpServer) {
     io = new Server(httpServer, {
         cors: {
-            origin: "https://omni-ai-theta-eight.vercel.app",
+            origin: "https://omni-ai-theta-eight.vercel.app || http://localhost:5173",
             credentials: true,
         }
     });

@@ -18,14 +18,7 @@ const transporter = nodemailer.createTransport({
   }
 })
 
-transporter.verify((error, success) => {
-  if (error) {
-    console.error('Error connecting to email server:', error);
-  } else {
-    console.log('Email server is ready to send messages');
-  }
-});
-
+// transporter.verify removed to prevent crash on expired OAuth token
 
 export async function sendEmail({ to, subject, html, text }) {
 
