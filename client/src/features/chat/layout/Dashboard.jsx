@@ -91,7 +91,7 @@ const Dashboard = () => {
             {/* ── Welcome Screen ───────────────────────────────────────── */}
             {messages.length === 0 && !isAgentTyping ? (
               <div className='m-auto text-center select-none'>
-                <h1 className='text-3xl font-bold'>Where knowledge begins</h1>
+                <h1 className='text-3xl font-bold text-text-primary'>Where knowledge begins</h1>
                 <p className='text-text-muted text-[15px] mt-1'>Ask OmniMind anything...</p>
               </div>
             ) : (
