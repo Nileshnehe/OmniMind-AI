@@ -118,12 +118,16 @@ const Sidebar = ({ isOpen, onToggle, onChatSelect }) => {
 
       <div className={`flex-1 overflow-y-auto pr-1 mt-2 omnimind-scroller w-full ${isOpen ? 'block' : 'hidden'}`}>
         <RecentActivity title='Recent' icon={downArrowIcon} isOpen={isOpen}>
-          {Object.values(chats).map((chat) => (
+          {Object.values(chats)
+            // Optional: You could sort them here if they are out of order
+            .sort((a, b) => new Date(b.lastUpdated || b.createdAt || 0) - new Date(a.lastUpdated || a.createdAt || 0))
+            .map((chat) => (
             <RecentChat
               key={chat.id}
               chatId={chat.id}
               title={chat.title}
               createdAt={chat.createdAt || chat.lastUpdated}
+              isGeneratingTitle={chat.isGeneratingTitle}
               onClick={() => {
                 setActiveDropdownId(null); // Close any open menu on chat open
                 onChatSelect?.(chat.id);
