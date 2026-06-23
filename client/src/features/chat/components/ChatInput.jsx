@@ -3,7 +3,7 @@ import { Plus, X, FileImage, Loader2 } from 'lucide-react'
 
 import sendIcon from '../../../assets/send.svg'
 
-const ChatInput = ({ onSendMessage }) => {
+const ChatInput = ({ onSendMessage, isLoading }) => {
   const [text, setText] = useState('')
   const [isDragging, setIsDragging] = useState(false)
   const [selectedImage, setSelectedImage] = useState(null)
@@ -86,7 +86,7 @@ const ChatInput = ({ onSendMessage }) => {
 
   const handleSubmit = (e) => {
     if (e) e.preventDefault()
-    if ((!text.trim() && !selectedImage) || isUploading) return
+    if ((!text.trim() && !selectedImage) || isUploading || isLoading) return
 
     onSendMessage(text, selectedImage)
     setText('')
@@ -96,7 +96,9 @@ const ChatInput = ({ onSendMessage }) => {
   const handleKeyDown = (e) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault()
-      handleSubmit()
+      if (!isLoading && !isUploading) {
+        handleSubmit()
+      }
     }
   }
 
@@ -214,16 +216,17 @@ const ChatInput = ({ onSendMessage }) => {
               rows={1}
               placeholder='Ask me what you want'
               value={text}
+              disabled={isLoading}
               onChange={(e) => setText(e.target.value)}
               onKeyDown={handleKeyDown}
-              className='flex-1 bg-transparent text-text-primary text-[15px] outline-none placeholder:text-text-muted/60 resize-none max-h-60 overflow-y-auto omnimind-scrollbar py-1.5 leading-relaxed'
+              className='flex-1 bg-transparent text-text-primary text-[15px] outline-none placeholder:text-text-muted/60 resize-none max-h-60 overflow-y-auto omnimind-scrollbar py-1.5 leading-relaxed disabled:opacity-50'
               style={{ minHeight: '24px' }}
             />
 
             <button
               type="submit"
-              disabled={(!text.trim() && !selectedImage) || isUploading}
-              className={`py-2 px-2 ml-2 rounded-lg transition-all duration-200 mb-0.5 ${((text.trim() || selectedImage) && !isUploading) ? 'bg-text-primary/10 cursor-pointer opacity-100 hover:bg-text-primary/20' : 'opacity-40 cursor-not-allowed'
+              disabled={(!text.trim() && !selectedImage) || isUploading || isLoading}
+              className={`py-2 px-2 ml-2 rounded-lg transition-all duration-200 mb-0.5 ${((text.trim() || selectedImage) && !isUploading && !isLoading) ? 'bg-text-primary/10 cursor-pointer opacity-100 hover:bg-text-primary/20' : 'opacity-40 cursor-not-allowed'
                 }`}
             >
               <img src={sendIcon} alt="send"

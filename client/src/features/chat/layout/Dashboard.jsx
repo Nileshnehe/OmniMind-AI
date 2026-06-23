@@ -217,7 +217,7 @@ const Dashboard = () => {
           </div>
         </div>
 
-        <ChatInput onSendMessage={handleSend} />
+        <ChatInput onSendMessage={handleSend} isLoading={isLoading || isAgentTyping} />
       </div>
 
     </div>
