@@ -24,8 +24,21 @@ const chatSlice = createSlice({
             state.error = action.payload
         },
         createNewChat: (state, action) => {
+            const { chatId, title, isGeneratingTitle } = action.payload;
+            state.chats[chatId] = { id: chatId, title, messages: [], lastUpdated: new Date().toISOString(), isGeneratingTitle: isGeneratingTitle || false };
+        },
+        updateChatTitle: (state, action) => {
             const { chatId, title } = action.payload;
-            state.chats[chatId] = { id: chatId, title, messages: [], lastUpdated: new Date().toISOString() };
+            if (state.chats[chatId]) {
+                state.chats[chatId].title = title;
+                state.chats[chatId].isGeneratingTitle = false;
+            }
+        },
+        setGeneratingTitle: (state, action) => {
+            const { chatId, isGenerating } = action.payload;
+            if (state.chats[chatId]) {
+                state.chats[chatId].isGeneratingTitle = isGenerating;
+            }
         },
         addNewMessage: (state, action) => {
             const { chatId, content, role } = action.payload;
@@ -54,7 +67,7 @@ const chatSlice = createSlice({
     }
 });
 
-export const { setChats, setCurrentChatId, setLoading, setError, createNewChat, addNewMessage, addMessages, removeChat, setTypingStatus } = chatSlice.actions;
+export const { setChats, setCurrentChatId, setLoading, setError, createNewChat, updateChatTitle, setGeneratingTitle, addNewMessage, addMessages, removeChat, setTypingStatus } = chatSlice.actions;
 export default chatSlice.reducer;
 
 

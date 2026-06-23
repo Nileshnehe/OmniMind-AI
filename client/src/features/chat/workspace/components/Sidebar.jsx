@@ -116,7 +116,7 @@ const Sidebar = ({ isOpen, onToggle, onChatSelect }) => {
         </div>
       </div>
 
-      <div className={`flex-1 overflow-y-auto pr-1 mt-2 omnimind-scroller w-full ${isOpen ? 'block' : 'hidden'}`}>
+      <div className={`flex-1 overflow-y-auto pr-1 mt-2 pb-6 omnimind-scroller w-full ${isOpen ? 'block' : 'hidden'}`}>
         <RecentActivity title='Recent' icon={downArrowIcon} isOpen={isOpen}>
           {Object.values(chats)
             // Optional: You could sort them here if they are out of order
