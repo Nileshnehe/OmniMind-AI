@@ -8,7 +8,7 @@ import chatRouter from "./routes/chat.route.js";
 const app = express();
 
 app.use(cors({
-    origin: "https://omni-ai-theta-eight.vercel.app || http://localhost:5173",
+    origin: "https://omni-ai-theta-eight.vercel.app",
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE"],
 }))
