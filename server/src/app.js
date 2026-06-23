@@ -1,3 +1,4 @@
+import { configData } from "./config/config.js";
 import express from "express";
 import cookieParser from "cookie-parser";
 import cors from "cors"
@@ -8,7 +9,7 @@ import chatRouter from "./routes/chat.route.js";
 const app = express();
 
 app.use(cors({
-    origin: "https://omni-ai-theta-eight.vercel.app",
+    origin: configData.FRONTEND_URL,
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE"],
 }))

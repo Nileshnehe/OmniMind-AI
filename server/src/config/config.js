@@ -16,5 +16,6 @@ export const configData = {
     GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID,
     JWT_SECRET: process.env.JWT_SECRET,
     GEMINI_API: process.env.GEMINI_API_KEY,
-    MISTRAL_API: process.env.MISTRAL_API_KEY
+    MISTRAL_API: process.env.MISTRAL_API_KEY,
+    FRONTEND_URL: process.env.FRONTEND_URL
 }
