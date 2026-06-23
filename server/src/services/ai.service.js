@@ -1,4 +1,3 @@
-import { response } from "express";
 import { ChatGoogleGenerativeAI } from "@langchain/google-genai"
 import { ChatMistralAI } from "@langchain/mistralai"
 import { AIMessage, HumanMessage, SystemMessage } from "langchain"
@@ -7,14 +6,14 @@ import { configData } from "../config/config.js"
 
 const geminiModel = new ChatGoogleGenerativeAI({
 
-    model: "gemini-2.5-flash-lite",
-    apiKey: configData.GEMINI_API_KEY
+    model: "gemini-2.5-flash",
+    apiKey: configData.GEMINI_API
 });
 
 const mistralModel = new ChatMistralAI({
 
     model: "mistral-small-latest",
-    apiKey: configData.MISTRAL_API_KEY
+    apiKey: configData.MISTRAL_API
 })
 
 
