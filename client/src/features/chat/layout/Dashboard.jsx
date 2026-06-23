@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router';
+import { Copy, Check, Pencil } from 'lucide-react';
 import Sidebar from '../workspace/components/Sidebar';
 import ChatInput from '../components/ChatInput';
 import TypewriterMessage from '../components/TypewriterMessage';
@@ -9,6 +10,11 @@ import { useChat } from '../hooks/useChat';
 const Dashboard = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [userProfile] = useState({ username: 'Loading...' });
+
+  // ── Interaction States ───────────────────────────────────────────
+  const [copiedMessageId, setCopiedMessageId] = useState(null);
+  const [editingMessageIndex, setEditingMessageIndex] = useState(null);
+  const [editContent, setEditContent] = useState('');
 
   // ── URL params & navigation ──────────────────────────────────────
   // chatId comes from the URL: /chat/:chatId
@@ -65,6 +71,29 @@ const Dashboard = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' });
   }, []);
 
+  // ── Message Actions ──────────────────────────────────────────────
+  const handleCopy = useCallback((index, content) => {
+    navigator.clipboard.writeText(content);
+    setCopiedMessageId(index);
+    setTimeout(() => setCopiedMessageId(null), 2000);
+  }, []);
+
+  const handleEditClick = useCallback((index, content) => {
+    setEditingMessageIndex(index);
+    setEditContent(content);
+  }, []);
+
+  const handleCancelEdit = useCallback(() => {
+    setEditingMessageIndex(null);
+    setEditContent('');
+  }, []);
+
+  const handleUpdateMessage = useCallback((index, newContent) => {
+    console.log("Update message", index, newContent);
+    // Add logic here to update message via API / Redux if implemented
+    handleCancelEdit();
+  }, [handleCancelEdit]);
+
   // Trigger auto-scroll on new messages or when agent typing status changes
   useEffect(() => {
     scrollToBottom();
@@ -97,34 +126,85 @@ const Dashboard = () => {
             ) : (
               <>
                 {/* ── Message Bubbles ────────────────────────────────── */}
-                {messages.map((message, index) => (
+                {messages.map((message, index) => {
+                  const isLastUserMessage = message.role === 'user' && index === messages.map(m => m.role).lastIndexOf('user');
+
+                  return (
                   <div
                     key={index}
-                    className={`flex flex-col p-3.5 rounded-xl text-[15px] leading-relaxed
+                    className={`flex flex-col text-[15px] leading-relaxed
                       ${message.role === 'user'
-                        ? 'bg-surface-hover ml-auto text-text-primary rounded-br-none max-w-[80%] w-fit'
-                        : 'bg-bg-card dark:bg-[#161722] border border-border dark:border-[#2D3042] mr-auto text-text-primary rounded-bl-none w-full'
+                        ? 'group relative ml-auto max-w-[80%] w-fit'
+                        : 'group relative mr-auto text-text-primary w-full py-3'
                       }`}
                   >
-                    <p className='font-bold text-[11px] uppercase tracking-wider mb-1 text-text-muted'>
-                      {message.role === 'user' ? 'You' : 'OmniMind AI'}
-                    </p>
-
                     {message.role === 'user' ? (
-                      <p className='whitespace-pre-wrap break-words leading-relaxed'>
-                        {message.content}
-                      </p>
+                      editingMessageIndex === index ? (
+                        <div className="flex flex-col gap-2 w-full min-w-[300px] mb-4">
+                          <textarea
+                            className="w-full min-h-[100px] p-3 rounded-2xl bg-surface-hover/50 dark:bg-surface/50 border border-border dark:border-[#2D3042] text-text-primary focus:ring-1 focus:ring-blue-500 outline-none resize-none"
+                            value={editContent}
+                            onChange={(e) => setEditContent(e.target.value)}
+                          />
+                          <div className="flex justify-end gap-2">
+                            <button onClick={handleCancelEdit} className="px-4 py-2 rounded-full text-sm font-medium text-text-muted hover:bg-surface-hover transition-colors">Cancel</button>
+                            <button 
+                              onClick={() => handleUpdateMessage(index, editContent)}
+                              disabled={!editContent.trim()}
+                              className="px-4 py-2 rounded-full text-sm font-medium bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                            >
+                              Update
+                            </button>
+                          </div>
+                        </div>
+                      ) : (
+                        <>
+                          <div className="bg-surface-hover text-text-primary p-3.5 rounded-xl rounded-br-none flex flex-col">
+                            <p className='font-bold text-[11px] uppercase tracking-wider mb-1 text-text-muted'>
+                              You
+                            </p>
+                            <p className='whitespace-pre-wrap break-words leading-relaxed'>
+                              {message.content}
+                            </p>
+                          </div>
+                          
+                          {/* User Hover Actions */}
+                          <div className="absolute -bottom-9 right-0 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity bg-bg-page dark:bg-[#0D0E15] p-1 rounded-lg border border-border dark:border-[#2D3042] shadow-sm z-10">
+                            {isLastUserMessage && (
+                              <button onClick={() => handleEditClick(index, message.content)} className="p-1.5 hover:bg-surface-hover rounded-md text-text-muted hover:text-text-primary transition-colors" title="Edit message">
+                                <Pencil className="w-3.5 h-3.5" />
+                              </button>
+                            )}
+                            <button onClick={() => handleCopy(index, message.content)} className="p-1.5 hover:bg-surface-hover rounded-md text-text-muted hover:text-text-primary transition-colors" title="Copy text">
+                              {copiedMessageId === index ? <Check className="w-3.5 h-3.5 text-green-500" /> : <Copy className="w-3.5 h-3.5" />}
+                            </button>
+                          </div>
+                        </>
+                      )
                     ) : (
-                      <TypewriterMessage
-                        text={message.content}
-                        speed={10}
-                        // animate only for freshly generated responses, never for history
-                        animate={message.isNew && message.role !== 'user'}
-                        onTyping={scrollToBottom}
-                      />
+                      <>
+                        <p className='font-bold text-[11px] uppercase tracking-wider mb-1 text-text-muted'>
+                          OmniMind AI
+                        </p>
+                        <TypewriterMessage
+                          text={message.content}
+                          speed={10}
+                          // animate only for freshly generated responses, never for history
+                          animate={message.isNew && message.role !== 'user'}
+                          onTyping={scrollToBottom}
+                        />
+                        
+                        {/* AI Actions */}
+                        <div className="flex items-center gap-2 mt-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                          <button onClick={() => handleCopy(index, message.content)} className="p-1.5 hover:bg-surface-hover rounded-full text-text-muted hover:text-text-primary transition-colors" title="Copy text">
+                            {copiedMessageId === index ? <Check className="w-4 h-4 text-green-500" /> : <Copy className="w-4 h-4" />}
+                          </button>
+                        </div>
+                      </>
                     )}
                   </div>
-                ))}
+                  );
+                })}
 
                 {/* ── TypingIndicator: 3 bouncing dots while AI thinks ── */}
                 {(isAgentTyping || isLoading) && <TypingIndicator />}

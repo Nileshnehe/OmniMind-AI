@@ -80,10 +80,23 @@ export const useChat = () => {
             dispatch(setLoading(true));
             if (socket) socket.emit("agentTyping", true);
 
+            let optimisticChatId = currentChatId;
+
             // Optimistic UI Update: Turant user ka message screen par dikhao
-            if (currentChatId) {
+            if (!currentChatId) {
+                // It's a new chat, so create an optimistic placeholder to show the skeleton loader
+                optimisticChatId = `temp-${Date.now()}`;
+                dispatch(createNewChat({
+                    chatId: optimisticChatId,
+                    title: "New Chat",
+                    isGeneratingTitle: true
+                }));
+                dispatch(setCurrentChatId(optimisticChatId));
+            }
+
+            if (optimisticChatId) {
                 dispatch(addNewMessage({
-                    chatId: currentChatId,
+                    chatId: optimisticChatId,
                     content: messageText,
                     role: "user",
                 }));
@@ -106,10 +119,16 @@ export const useChat = () => {
 
             // Agar naya chat tha (chatId null tha), toh usko pehle Redux me create karo
             if (!currentChatId && chat) {
+                // Remove the optimistic temporary chat
+                dispatch(removeChat(optimisticChatId));
+
+                // Create the real chat in Redux
                 dispatch(createNewChat({
                     chatId: finalChatId,
                     title: title || chat.title,
+                    isGeneratingTitle: false // We already have the title
                 }));
+
                 // User message retrospective add karo
                 dispatch(addNewMessage({
                     chatId: finalChatId,
@@ -117,6 +136,9 @@ export const useChat = () => {
                     role: "user",
                 }));
                 dispatch(setCurrentChatId(finalChatId));
+            } else if (title) {
+                // If the chat already existed but a new title was generated
+                dispatch(updateChatTitle({ chatId: finalChatId, title }));
             }
 
             // AI ka reply screen par add karo
