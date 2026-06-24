@@ -28,8 +28,8 @@ export const useAuth = () => {
   const checkSession = useCallback(async () => {
     const result = await dispatch(getMeThunk());
     // If the thunk was aborted because no token exists (condition returned false),
-    // result.meta.condition will be false — dispatch sessionSkipped to unblock routes.
-    if (result.meta?.condition === false) {
+    // dispatch sessionSkipped to clear isCheckingSession so routes don't hang.
+    if (getMeThunk.rejected.match(result) && result.meta?.condition === true) {
       dispatch(sessionSkipped());
     }
   }, [dispatch]);

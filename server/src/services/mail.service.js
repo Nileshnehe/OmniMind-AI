@@ -2,19 +2,21 @@ import { configData } from "../config/config.js";
 import nodemailer from "nodemailer";
 
 function createTransporter() {
-  // Use Gmail App Password (SMTP) — stable on all environments including Render.
-  // OAuth2 access tokens expire every 60 minutes and break on deployed servers.
-  // To generate an App Password: Google Account → Security → 2-Step Verification → App Passwords
   return nodemailer.createTransport({
     service: "gmail",
     auth: {
+      type: "OAuth2",
       user: configData.GOOGLE_USER,
-      pass: configData.GOOGLE_APP_PASSWORD,
+      clientId: configData.GOOGLE_CLIENT_ID,
+      clientSecret: configData.GOOGLE_CLIENT_SECRET,
+      refreshToken: configData.GOOGLE_REFRESH_TOKEN,
+      accessToken: configData.GOOGLE_ACCESS_TOKEN,
     },
   });
 }
 
 export async function sendEmail({ to, subject, html, text }) {
+  // Create a fresh transporter each time to avoid stale OAuth tokens
   const transporter = createTransporter();
 
   const mailOptions = {
