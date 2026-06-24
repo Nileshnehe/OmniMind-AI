@@ -3,6 +3,7 @@ import jwt from "jsonwebtoken";
 import { sendEmail } from "../services/mail.service.js";
 import { configData } from "../config/config.js";
 
+
 export async function register(req, res) {
     try {
         const { username, email, password } = req.body;
@@ -19,7 +20,7 @@ export async function register(req, res) {
             });
         }
 
-        
+
         const user = await userModel.create({ username, email, password });
 
         // 2. Validate secret exists before signing
@@ -28,14 +29,14 @@ export async function register(req, res) {
             return res.status(500).json({ success: false, message: "Internal server configuration error" });
         }
 
-        
+
         const emailVerificationToken = jwt.sign(
             { email: user.email },
             configData.JWT_SECRET,
-            { expiresIn: '1d' } 
+            { expiresIn: '1d' }
         );
 
-        
+
         await sendEmail({
             to: email,
             subject: "Welcome to Omnimind AI",
@@ -70,7 +71,7 @@ export async function register(req, res) {
                             <table role="presentation" border="0" cellpadding="0" cellspacing="0" style="margin: 30px 0;">
                                 <tr>
                                     <td align="center" bgcolor="#4f46e5" style="border-radius: 8px;">
-                                        <a href="http://localhost:3000/api/auth/verify-email?token=${emailVerificationToken}" target="_blank" style="font-size: 16px; font-weight: 600; color: #ffffff; text-decoration: none; padding: 14px 32px; display: inline-block; letter-spacing: 0.5px;">Verify Email Address</a>
+                                        <a href="https://omni-ai-okk7.onrender.com/api/auth/verify-email?token=${emailVerificationToken}" target="_blank" style="font-size: 16px; font-weight: 600; color: #ffffff; text-decoration: none; padding: 14px 32px; display: inline-block; letter-spacing: 0.5px;">Verify Email Address</a>
                                     </td>
                                 </tr>
                             </table>
@@ -166,7 +167,7 @@ export async function login(req, res) {
             return res.status(500).json({ success: false, message: "Internal server error" });
         }
 
-        
+
         const token = jwt.sign(
             { id: user._id, username: user.username },
             configData.JWT_SECRET,
@@ -206,7 +207,7 @@ export async function login(req, res) {
 
 export async function getMe(req, res) {
     try {
-        
+
         if (!req.user || !req.user.id) {
             return res.status(401).json({
                 message: "Unauthorized access. No user session found.",
@@ -217,7 +218,7 @@ export async function getMe(req, res) {
 
         const userId = req.user.id;
 
-        
+
         const user = await userModel.findById(userId).select("-password");
 
         if (!user) {
@@ -228,7 +229,7 @@ export async function getMe(req, res) {
             });
         }
 
-        
+
         return res.status(200).json({
             message: "User details fetched successfully",
             success: true,
@@ -238,7 +239,7 @@ export async function getMe(req, res) {
     } catch (error) {
         console.error("GetMe Error:", error);
 
-        
+
         if (error.name === "CastError") {
             return res.status(400).json({
                 success: false,
