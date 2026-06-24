@@ -42,11 +42,11 @@ export async function register(req, res) {
         );
 
 
-        try {
-            await sendEmail({
-                to: email,
-                subject: "Welcome to Omnimind AI",
-                html: `
+        // --- Fire-and-forget: send email in background, never block the response ---
+        sendEmail({
+            to: email,
+            subject: "Welcome to Omnimind AI",
+            html: `
 <!DOCTYPE html>
 <html>
 <head>
@@ -110,13 +110,16 @@ export async function register(req, res) {
 </body>
 </html>
 `
-            });
-        } catch (emailErr) {
-            console.error("Welcome email failed:", emailErr.message);
-            // Email failure should NOT block registration — user is already created
-        }
+        })
+        .then(() => {
+            console.log(`[auth] Verification email sent successfully to: ${email}`);
+        })
+        .catch((emailErr) => {
+            // Log clearly in Render console — does NOT affect the user session
+            console.error(`[auth] Background email to ${email} failed:`, emailErr.message);
+        });
 
-        // 5. Respond
+        // Respond immediately — do NOT wait for the email to send
         return res.status(201).json({
             message: "User registered successfully",
             success: true,

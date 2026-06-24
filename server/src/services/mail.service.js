@@ -2,16 +2,30 @@ import { configData } from "../config/config.js";
 import nodemailer from "nodemailer";
 
 function createTransporter() {
+  // Validate that all required OAuth2 fields are present at creation time
+  const { GOOGLE_USER, GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, GOOGLE_REFRESH_TOKEN } = configData;
+  if (!GOOGLE_USER || !GOOGLE_CLIENT_ID || !GOOGLE_CLIENT_SECRET || !GOOGLE_REFRESH_TOKEN) {
+    console.error(
+      "[mail.service] MISSING OAuth2 config fields:",
+      { GOOGLE_USER: !!GOOGLE_USER, GOOGLE_CLIENT_ID: !!GOOGLE_CLIENT_ID,
+        GOOGLE_CLIENT_SECRET: !!GOOGLE_CLIENT_SECRET, GOOGLE_REFRESH_TOKEN: !!GOOGLE_REFRESH_TOKEN }
+    );
+  }
+
   return nodemailer.createTransport({
     service: "gmail",
     auth: {
       type: "OAuth2",
-      user: configData.GOOGLE_USER,
-      clientId: configData.GOOGLE_CLIENT_ID,
-      clientSecret: configData.GOOGLE_CLIENT_SECRET,
-      refreshToken: configData.GOOGLE_REFRESH_TOKEN,
-      // accessToken: configData.GOOGLE_ACCESS_TOKEN,
+      user: GOOGLE_USER,
+      clientId: GOOGLE_CLIENT_ID,
+      clientSecret: GOOGLE_CLIENT_SECRET,
+      refreshToken: GOOGLE_REFRESH_TOKEN,
+      // Never hard-code a short-lived accessToken here — let Nodemailer
+      // use the refreshToken to obtain a fresh one automatically.
     },
+    // Fail fast on Render / cloud environments instead of hanging for 60s
+    connectionTimeout: 10_000, // 10 seconds to establish the TCP connection
+    socketTimeout: 10_000,    // 10 seconds of inactivity before giving up
   });
 }
 
