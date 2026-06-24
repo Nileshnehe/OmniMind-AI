@@ -3,9 +3,9 @@ import { Navigate } from 'react-router';
 import { useAuth } from '../hooks/useAuth';
 
 const PublicRoute = ({ children }) => {
-    const { isAuthenticated, isCheckingSession, loading } = useAuth();
+    const { isAuthenticated, isCheckingSession } = useAuth();
 
-    if (isCheckingSession || loading) {
+    if (isCheckingSession) {
         return null;
     }
 

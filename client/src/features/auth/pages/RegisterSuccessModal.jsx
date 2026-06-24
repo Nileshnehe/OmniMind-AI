@@ -1,12 +1,12 @@
 // src/features/auth/pages/RegisterSuccessModal.jsx
 import React from 'react';
-import './RegisterSuccessModal.css'; // 🟢 Styling file separation import
+import './RegisterSuccessModal.css'; // 🟢 Styling file separation impor
 
 const RegisterSuccessModal = ({ email, onConfirm }) => {
   return (
     <div className='reg-modal-backdrop'>
       <div className='reg-modal-box'>
-        
+
         {/* Email Envelope SVG Icon */}
         <div className='reg-modal-icon-wrapper'>
           <svg className="w-7 h-7" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
@@ -15,7 +15,7 @@ const RegisterSuccessModal = ({ email, onConfirm }) => {
         </div>
 
         <h2 className='reg-modal-title'>Registration Complete!</h2>
-        
+
         <p className='reg-modal-text'>
           We have sent a verification link. Please check your inbox at <span className='text-[var(--color-text-primary)] font-semibold break-all'>{email}</span> and verify your email before logging in.
         </p>
@@ -23,7 +23,7 @@ const RegisterSuccessModal = ({ email, onConfirm }) => {
         <button onClick={onConfirm} className='reg-modal-btn'>
           Go to Login
         </button>
-        
+
       </div>
     </div>
   );

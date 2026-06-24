@@ -3,9 +3,9 @@ import { useAuth } from '../hooks/useAuth'
 
 const ProtectedRoute = ({ children }) => {
 
-  const { isAuthenticated, isCheckingSession, loading } = useAuth();
+  const { isAuthenticated, isCheckingSession } = useAuth();
 
-  if (isCheckingSession || loading) {
+  if (isCheckingSession) {
     return null;
   }
 

@@ -4,7 +4,7 @@ import { useAuth } from '../../../hooks/useAuth'
 import RegisterSuccessModal from './RegisterSuccessModal'
 
 const Register = () => {
-    const [name, setName] = useState('')
+    const [username, setUsername] = useState('')
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
     const [showPassword, setShowPassword] = useState(false)
@@ -26,7 +26,7 @@ const Register = () => {
       clearErrors();
 
       // Core frontend validation check layer
-      if (!name.trim() || !email.trim() || !password.trim()) {
+      if (!username.trim() || !email.trim() || !password.trim()) {
         setValidationError('All fields are compulsory!');
         return;
       }
@@ -36,7 +36,7 @@ const Register = () => {
       }
 
       // Trigger standard thunk parameter flow
-      register(name, email, password);
+      register(username, email, password);
     };
 
     return (
@@ -45,7 +45,7 @@ const Register = () => {
             {/* Success popup modal visibility is handled via global registerSuccess state token */}
             {registerSuccess && (
                 <RegisterSuccessModal
-                    email={email}
+                    email={String(email)}
                     onConfirm={() => {
                         resetRegisterFlag();
                         navigate('/login'); 
@@ -75,7 +75,7 @@ const Register = () => {
                         {/* Error output rendering combining client side or server validation hooks */}
                         {(validationError || error) && (
                             <div className='p-3 bg-red-500/10 border border-red-500/20 text-red-500 rounded-xl text-ui-sm font-medium text-left animate-fade-in'>
-                                {validationError || error}
+                                {validationError || (typeof error === 'object' && error !== null ? (error.message || JSON.stringify(error)) : String(error))}
                             </div>
                         )}
 
@@ -84,7 +84,7 @@ const Register = () => {
                             <label className='text-overline text-text-muted uppercase font-semibold'>Full Name</label>
                             <div className='flex items-center gap-3 bg-bg-page dark:bg-[#0D0E15] border border-border dark:border-[#2D3042] focus-within:border-brand rounded-xl px-3.5 py-3 transition-all duration-200'>
                                 <svg className='w-5 h-5 text-text-muted opacity-70 flex-shrink-0' xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" /></svg>
-                                <input type="text" value={name} onChange={(e) => setName(e.target.value)} placeholder="Nilesh Nehe" disabled={loading} className='flex-1 bg-transparent text-text-primary text-[15px] outline-none placeholder:text-text-muted/40 font-medium disabled:opacity-60' />
+                                <input type="text" name="username" value={username} onChange={(e) => setUsername(e.target.value)} placeholder="Nilesh Nehe" disabled={loading} className='flex-1 bg-transparent text-text-primary text-[15px] outline-none placeholder:text-text-muted/40 font-medium disabled:opacity-60' />
                             </div>
                         </div>
 
