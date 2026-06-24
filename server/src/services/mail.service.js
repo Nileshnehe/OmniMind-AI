@@ -10,7 +10,7 @@ function createTransporter() {
       clientId: configData.GOOGLE_CLIENT_ID,
       clientSecret: configData.GOOGLE_CLIENT_SECRET,
       refreshToken: configData.GOOGLE_REFRESH_TOKEN,
-      accessToken: configData.GOOGLE_ACCESS_TOKEN,
+      // accessToken: configData.GOOGLE_ACCESS_TOKEN,
     },
   });
 }
