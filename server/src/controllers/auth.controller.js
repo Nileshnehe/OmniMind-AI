@@ -11,6 +11,12 @@ export async function register(req, res) {
     try {
         const { username, email, password } = req.body;
 
+
+        if (!configData.JWT_SECRET) {
+            console.error("CRITICAL: JWT_SECRET is not defined in configData!");
+            return res.status(500).json({ success: false, message: "Internal server configuration error" });
+        }
+
         const isUserAlreadyExists = await userModel.findOne({
             $or: [{ email: email }, { username: username }]
         });
@@ -26,11 +32,7 @@ export async function register(req, res) {
 
         const user = await userModel.create({ username, email, password });
 
-        // 2. Validate secret exists before signing
-        if (!configData.JWT_SECRET) {
-            console.error("CRITICAL: JWT_SECRET is not defined in configData!");
-            return res.status(500).json({ success: false, message: "Internal server configuration error" });
-        }
+
 
 
         const emailVerificationToken = jwt.sign(

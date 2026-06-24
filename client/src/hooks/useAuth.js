@@ -1,6 +1,5 @@
 import { useSelector, useDispatch } from 'react-redux';
 import { loginUserThunk, registerUserThunk, clearAuthErrors, resetRegisterStatus, getMeThunk, logoutUserThunk, sessionSkipped } from '../store/slices/auth.slice';
-import { authServices } from '../features/auth/services/auth.api';
 import { useCallback } from 'react';
 
 export const useAuth = () => {
