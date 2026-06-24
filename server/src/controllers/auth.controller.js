@@ -3,6 +3,9 @@ import jwt from "jsonwebtoken";
 import { sendEmail } from "../services/mail.service.js";
 import { configData } from "../config/config.js";
 
+// Resolve the backend base URL for links sent in emails
+const BACKEND_BASE_URL = configData.BACKEND_URL;
+
 
 export async function register(req, res) {
     try {
@@ -37,10 +40,11 @@ export async function register(req, res) {
         );
 
 
-        await sendEmail({
-            to: email,
-            subject: "Welcome to Omnimind AI",
-            html: `
+        try {
+            await sendEmail({
+                to: email,
+                subject: "Welcome to Omnimind AI",
+                html: `
 <!DOCTYPE html>
 <html>
 <head>
@@ -71,7 +75,7 @@ export async function register(req, res) {
                             <table role="presentation" border="0" cellpadding="0" cellspacing="0" style="margin: 30px 0;">
                                 <tr>
                                     <td align="center" bgcolor="#4f46e5" style="border-radius: 8px;">
-                                        <a href="https://omni-ai-okk7.onrender.com/api/auth/verify-email?token=${emailVerificationToken}" target="_blank" style="font-size: 16px; font-weight: 600; color: #ffffff; text-decoration: none; padding: 14px 32px; display: inline-block; letter-spacing: 0.5px;">Verify Email Address</a>
+                                        <a href="${BACKEND_BASE_URL}/api/auth/verify-email?token=${emailVerificationToken}" target="_blank" style="font-size: 16px; font-weight: 600; color: #ffffff; text-decoration: none; padding: 14px 32px; display: inline-block; letter-spacing: 0.5px;">Verify Email Address</a>
                                     </td>
                                 </tr>
                             </table>
@@ -104,7 +108,11 @@ export async function register(req, res) {
 </body>
 </html>
 `
-        }).catch(err => console.error("Welcome email failed:", err.message));
+            });
+        } catch (emailErr) {
+            console.error("Welcome email failed:", emailErr.message);
+            // Email failure should NOT block registration — user is already created
+        }
 
         // 5. Respond
         return res.status(201).json({
@@ -260,7 +268,7 @@ export async function verify(req, res) {
     try {
 
 
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        const decoded = jwt.verify(token, configData.JWT_SECRET);
 
 
         const user = await userModel.findOne({ email: decoded.email });
