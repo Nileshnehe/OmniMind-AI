@@ -37,6 +37,16 @@ export const getMeThunk = createAsyncThunk(
     } catch (err) {
       return rejectWithValue(err.response?.data || { message: 'Not authenticated' });
     }
+  },
+  {
+    // Token Pre-Check: abort the thunk entirely if no token exists in localStorage.
+    // This prevents unnecessary API calls to /api/auth/me on public routes.
+    condition: () => {
+      const token = localStorage.getItem('omnimind_token');
+      if (!token) {
+        return false; // returning false cancels the thunk — no API call is made
+      }
+    },
   }
 );
 
@@ -69,7 +79,14 @@ const authSlice = createSlice({
     },
     resetRegisterStatus: (state) => {
       state.registerSuccess = false;
-    }
+    },
+    // Dispatched by checkSession() when getMeThunk is skipped (no token found).
+    // Ensures isCheckingSession is resolved so routes don't hang on the loading spinner.
+    sessionSkipped: (state) => {
+      state.isCheckingSession = false;
+      state.isAuthenticated = false;
+      state.user = null;
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -102,6 +119,10 @@ const authSlice = createSlice({
         state.loading = false;
         state.isAuthenticated = true;
         state.user = action.payload?.user || null;
+        // Persist token so getMeThunk can verify session on reload
+        if (action.payload?.token) {
+          localStorage.setItem('omnimind_token', action.payload.token);
+        }
       })
       .addCase(loginUserThunk.rejected, (state, action) => {
         state.loading = false;
@@ -133,19 +154,23 @@ const authSlice = createSlice({
       .addCase(logoutUserThunk.pending, (state) => {
         state.isAuthenticated = false;
         state.user = null;
+        localStorage.removeItem('omnimind_token');
       })
       .addCase(logoutUserThunk.fulfilled, (state) => {
         state.isAuthenticated = false;
         state.user = null;
         state.loading = false;
+        localStorage.removeItem('omnimind_token');
       })
       .addCase(logoutUserThunk.rejected, (state) => {
+        // Even if server-side logout fails, clear client state and token
         state.isAuthenticated = false;
         state.user = null;
         state.loading = false;
+        localStorage.removeItem('omnimind_token');
       });
   }
 });
 
-export const { clearAuthErrors, resetRegisterStatus } = authSlice.actions;
+export const { clearAuthErrors, resetRegisterStatus, sessionSkipped } = authSlice.actions;
 export default authSlice.reducer;

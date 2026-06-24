@@ -1,5 +1,5 @@
 import { useSelector, useDispatch } from 'react-redux';
-import { loginUserThunk, registerUserThunk, clearAuthErrors, resetRegisterStatus, getMeThunk, logoutUserThunk } from '../store/slices/auth.slice';
+import { loginUserThunk, registerUserThunk, clearAuthErrors, resetRegisterStatus, getMeThunk, logoutUserThunk, sessionSkipped } from '../store/slices/auth.slice';
 import { authServices } from '../features/auth/services/auth.api';
 import { useCallback } from 'react';
 
@@ -25,8 +25,13 @@ export const useAuth = () => {
     dispatch(resetRegisterStatus());
   }, [dispatch]);
 
-  const checkSession = useCallback(() => {
-    dispatch(getMeThunk());
+  const checkSession = useCallback(async () => {
+    const result = await dispatch(getMeThunk());
+    // If the thunk was aborted because no token exists (condition returned false),
+    // dispatch sessionSkipped to clear isCheckingSession so routes don't hang.
+    if (getMeThunk.rejected.match(result) && result.meta?.condition === true) {
+      dispatch(sessionSkipped());
+    }
   }, [dispatch]);
 
   const logout = useCallback(() => {
