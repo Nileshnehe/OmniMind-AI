@@ -1,7 +1,7 @@
 import { configData } from "../config/config.js";
 import nodemailer from "nodemailer";
 
-console.log("USER:", configData.GOOGLE_USER);
+// console.log("USER:", configData.GOOGLE_USER);
 // console.log("CLIENT_ID:", process.env.GOOGLE_CLIENT_ID);
 // console.log("CLIENT_SECRET:", process.env.GOOGLE_CLIENT_SECRET);
 // console.log("REFRESH_TOKEN:", process.env.GOOGLE_REFRESH_TOKEN);
@@ -18,7 +18,14 @@ const transporter = nodemailer.createTransport({
   }
 })
 
-// transporter.verify removed to prevent crash on expired OAuth token
+transporter.verify((error, success) => {
+  if (error) {
+    console.error('Error connecting to email server:', error);
+  } else {
+    console.log('Email server is ready to send messages');
+  }
+});
+
 
 export async function sendEmail({ to, subject, html, text }) {
 
@@ -30,8 +37,11 @@ export async function sendEmail({ to, subject, html, text }) {
     text
   };
 
+
   try {
+
     const details = await transporter.sendMail(mailOptions);
+
     console.log("Email sent:", details);
     return details;
   } catch (error) {
