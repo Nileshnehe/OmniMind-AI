@@ -3,6 +3,7 @@ import chatModel from "../models/chat.model.js";
 import messageModel from "../models/message.model.js";
 
 export async function sendMessage(req, res) {
+
     try {
         const { message, chat: chatId } = req.body;
         console.log(req.body);
@@ -33,7 +34,7 @@ export async function sendMessage(req, res) {
 
 
         const result = await generateResponse(messages);
-
+        console.log("result: ", result)
         const aiResponse = await messageModel.create({
             chat: activeChatId,
             content: result,
@@ -52,6 +53,7 @@ export async function sendMessage(req, res) {
 }
 
 export async function getChats(req, res) {
+    console.log("getChat")
     try {
         const user = req.user;
 
