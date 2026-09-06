@@ -1,46 +1,59 @@
+import { Suspense, lazy } from 'react';
 import { createBrowserRouter } from 'react-router'
-import Register from '../features/auth/pages/Register'
-import Dashboard from '../features/chat/layout/Dashboard'
-import Login from '../features/auth/pages/Login'
-import PricingPlans from '../features/chat/components/PricingPage'
-import ProtectedRoute from './ProtectedRoute'
-import PublicRoute from './PublicRoute'
+import ProtectedRoute from './ProtectedRoute';
+import PublicRoute from './PublicRoute';
+import { PageSkeletonLoader } from '../features/chat/components/PageSkeletonLoader';
+
+// 🚀 1. Static imports hata kar Lazy Loading apply ki
+const Login = lazy(() => import('../features/auth/pages/Login'));
+const Register = lazy(() => import('../features/auth/pages/Register'));
+const Dashboard = lazy(() => import('../features/chat/layout/Dashboard'));
+const PricingPlans = lazy(() => import('../features/chat/components/PricingPage'));
+
+
+// 🛠️ 3. Helper function banaya taaki code clean rahe (baar-baar Suspense na likhna pade)
+const withSuspense = (Component) => (
+    <Suspense fallback={<PageSkeletonLoader />}>
+        <Component />
+    </Suspense>
+);
 
 export const routes = createBrowserRouter([
-
     {
         path: '/login',
-        element:
+        element: (
             <PublicRoute>
-                <Login />
+                {withSuspense(Login)}
             </PublicRoute>
+        )
     },
     {
         path: '/register',
-        element:
+        element: (
             <PublicRoute>
-                <Register />
+                {withSuspense(Register)}
             </PublicRoute>
+        )
     },
     {
         path: '/price',
-        element: <PricingPlans />
+        element: withSuspense(PricingPlans)
     },
     // Base dashboard (no active chat)
     {
         path: '/dashboard',
         element: (
             <ProtectedRoute>
-                <Dashboard />
+                {withSuspense(Dashboard)}
             </ProtectedRoute>
         ),
     },
-    // Dynamic chat route — chatId from URL hydrates the chat on reload
+    // Dynamic chat route 
     {
         path: '/chat/:chatId',
         element: (
             <ProtectedRoute>
-                <Dashboard />
+                {withSuspense(Dashboard)}
             </ProtectedRoute>
         ),
     },
@@ -48,8 +61,8 @@ export const routes = createBrowserRouter([
         path: '/',
         element: (
             <ProtectedRoute>
-                <Dashboard />
+                {withSuspense(Dashboard)}
             </ProtectedRoute>
         ),
     }
-])
+]);
